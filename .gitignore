@@ -1,0 +1,8 @@
+# Build trees
+build/
+experiments/build/
+
+# Learning experiment observable outputs (cwd = repo root)
+out/
+
+.DS_Store
