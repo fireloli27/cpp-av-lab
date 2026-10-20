@@ -16,13 +16,17 @@ Learning Project 的文档与实验地基。正式 Client AV SDK / Media Server 
 | 构建目录 | `experiments/build/`（增量复用；迭代间不要删） |
 | FetchContent 缓存 | `experiments/.fetchcontent/`（Catch2 源码；清 build 后可免重下） |
 | 可观察产物 | 仓库根下 `out/`（运行时 **cwd＝仓库根**） |
-| 短文根 / 模板 | `docs/learning/`、`docs/learning/_template.md` |
+| 短文根 / 模板 | `docs/learning/`、`docs/learning/_template.md`（怎么跑、怎么验收） |
+| 课记模板 | `docs/learning/_notes_template.md`（概念与代码讲解） |
 | 自动化测试 | `experiments/tests/`（Catch2） |
 | 一键护栏 | `scripts/check-learning.sh` |
 | 阶段实验（02+） | `experiments/{audio\|video}/{capture,encode,local-transport,decode,render}/` |
 | 阶段短文（02+） | `docs/learning/{audio\|video}/` 同名 `.md` |
+| 阶段课记（02+） | 同目录 `{stage}.notes.md`（与短文成对） |
 
 术语以仓库根 `GLOSSARY.md` 为准。Agent 搜索忽略 `experiments/build/`、`experiments/.fetchcontent/`、`out/`（见 `.cursorignore`）。
+
+**短文 vs 课记：** 短文是主缝验收文档；课记给人读懂实现并沉淀知识。Learning Pipeline Stage 票（`.scratch/learning-project/issues/` 下音/视五段）在 `/implement` 收官时必须写或更新对应课记（六栏齐全，见课记模板）；harness 占位票不要求课记。
 
 ## 配置与编译
 

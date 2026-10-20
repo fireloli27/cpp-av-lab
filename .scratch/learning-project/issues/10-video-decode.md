@@ -10,3 +10,4 @@
 - [ ] 成功时可观察帧输出
 - [ ] 输入与上游对齐或短文写明等价输入
 - [ ] 短文含目标、步骤、成功判据、所选库
+- [ ] 课记同目录 `{stage}.notes.md`（按 `docs/learning/_notes_template.md` 六栏；`/implement` 收官必写）

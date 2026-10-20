@@ -10,3 +10,4 @@
 - [ ] 成功判据可观察
 - [ ] 短文明确本票格式不对「必须 RTP」做产品拍板
 - [ ] 短文含目标、步骤、成功判据、所选库/机制
+- [ ] 课记同目录 `{stage}.notes.md`（按 `docs/learning/_notes_template.md` 六栏；`/implement` 收官必写）

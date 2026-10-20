@@ -14,7 +14,7 @@ Single-context: root `GLOSSARY.md` + `docs/adr/`. See `docs/agents/domain.md`.
 
 ### Learning Project
 
-Experiments, essay layout, and the Catch2/CTest guardrail: `docs/learning/harness/README.md`. One-command check: `./scripts/check-learning.sh`. Enable commit hook: `./scripts/install-git-hooks.sh`.
+Experiments, essay + **课记** layout, and the Catch2/CTest guardrail: `docs/learning/harness/README.md`. Stage tickets: short essay `{stage}.md` (run/accept) + notes `{stage}.notes.md` (understand code). Templates: `_template.md`, `_notes_template.md`. One-command check: `./scripts/check-learning.sh`. Enable commit hook: `./scripts/install-git-hooks.sh`.
 
 ### Git
 

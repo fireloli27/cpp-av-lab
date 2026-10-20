@@ -48,3 +48,5 @@ cmake --build experiments/build --target learning_audio_capture
 ## 与主缝关系
 
 本入口为音频采集阶段的独立可执行文件 `learning_audio_capture`；人工按本文步骤验收（听 WAV）。PCM→WAV 写入契约另由 `experiments/tests/test_capture_wav.cpp`（Catch2）覆盖，一键入口见 `scripts/check-learning.sh`。不依赖统一 pipeline runner。
+
+概念与代码讲解见课记 [capture.notes.md](./capture.notes.md)。

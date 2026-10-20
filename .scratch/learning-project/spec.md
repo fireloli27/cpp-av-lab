@@ -66,7 +66,8 @@ Status: ready-for-agent
 - **主测试缝（已决，issue 01；测试护栏经 retro 修订）**：以「阶段实验」为产品主缝——每一 Learning Pipeline Stage 提供一个可从仓库外部运行的实验入口，输入/前置条件写在短文里，成功时有可观察输出；**人工按短文验收**仍为一等公民。另以 **Catch2 + CTest** 护住可自动化的可观察契约（见 Testing Decisions）。WebRTC 对照以短文叙述验收，不另开代码缝。不做统一 pipeline runner。
 - **文档与代码布局（已决，issue 01）**：
   - 短文根：`docs/learning/`；模板：`docs/learning/_template.md`（必填：目标、前置、选用库、运行步骤、可观察成功判据、失败时仍记录什么、与主缝关系）。正文中文；路径/命令/目标名/GLOSSARY 术语不硬翻。
-  - 阶段短文/实验镜像：`docs/learning/{audio|video}/{capture,encode,local-transport,decode,render}.md` ↔ `experiments/{audio|video}/{同名}/`。
+  - **课记**（已决，retro 2026-10-20）：模板 `docs/learning/_notes_template.md`；路径 `docs/learning/{audio|video}/{stage}.notes.md`，与短文成对。短文＝跑通验收；课记＝概念与代码讲解。Learning Pipeline Stage 票 `/implement` 收官必写课记（六栏）；harness 占位不要求。
+  - 阶段短文/实验/课记镜像：`docs/learning/{audio|video}/{capture,encode,local-transport,decode,render}.md`（+ 同名 `.notes.md`）↔ `experiments/{audio|video}/{同名}/`。
   - CMake 根：`experiments/`（CMake ≥ 3.20，C++17）；构建目录 `experiments/build/`；可观察产物写在仓库根下 `out/`；运行约定 cwd＝仓库根。仓库根 `.gitignore` 忽略 `build/`、`experiments/build/`、`out/`、`.DS_Store`。
   - harness 地基（非管线阶段）：`experiments/harness/placeholder/`（目标名 `learning_placeholder`）+ `docs/learning/harness/` 总览与样例短文。01 不预建空的音/视阶段目录；不抽跨阶段 `experiments/common`；占位可抽本目录内小静态库供可执行文件与测试链接。
   - 自动化测试：`experiments/tests/`（Catch2 经 FetchContent）；仓库护栏命令：`scripts/check-learning.sh`（configure + build + ctest）。
@@ -132,3 +133,4 @@ Status: ready-for-agent
 - 2026-10-20: `/retro`——文件改名为 `spec.md`（对齐 issue-tracker）；推翻「不引入测试框架」，引入 Catch2 + `scripts/check-learning.sh`，并补 01 占位产物测试。
 - 2026-10-20: `/grill-with-docs` on issue 02——音频·采集选定 Core Audio / AudioQueue、PCM/WAV 契约与验收边界；未决 #4 仅部分收口；见 `issues/02-audio-capture.md` 与 `docs/adr/0001-learning-audio-capture-coreaudio.md`。
 - 2026-10-20: `/retro`（issue 02 会话）——护栏接入 pre-commit + GitHub Actions；FetchContent 缓存与增量 build；`.cursorignore`；harness/短文写明系统框架与非沙箱麦烟测；tdd/implement/code-review 技能收紧 grilled seams 与 working-tree 审查。
+- 2026-10-20: `/retro`——Learning 阶段票收官必写课记 `{stage}.notes.md`（模板 `_notes_template.md`）；样例 `docs/learning/audio/capture.notes.md`；`/implement` 与 harness/AGENTS 已接线。
