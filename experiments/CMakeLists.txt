@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(CTest)
 
 add_subdirectory(harness/placeholder)
+add_subdirectory(audio/capture)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

@@ -8,8 +8,10 @@ FetchContent_MakeAvailable(Catch2)
 
 list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/extras")
 
-add_executable(learning_tests test_placeholder_artifact.cpp)
+add_executable(learning_tests test_placeholder_artifact.cpp
+                              test_capture_wav.cpp)
 target_link_libraries(learning_tests PRIVATE learning_placeholder_lib
+                                             learning_audio_capture_lib
                                              Catch2::Catch2WithMain)
 
 include(Catch)

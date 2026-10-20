@@ -112,7 +112,7 @@ Status: ready-for-agent
 1. Media Signaling 的承载通道（复用 IM / 独立 WebSocket 或 HTTP / 随媒体通道 / 其他）
 2. Media Server（SFU）具体实现路线（自研比例 vs 开源改造选型）
 3. 部署形态（私有化 / 公有云多租户 / 两者）
-4. 五段实验各自的具体库与 API 选型（采集、编码、传输/打包、解码、渲染）
+4. 五段实验各自的具体库与 API 选型（采集、编码、传输/打包、解码、渲染）——**部分**：音频·采集学习实验已选 Core Audio / AudioQueue（见 issue 02 与 ADR-0001）；其余阶段仍未决
 5. **阶段 3「打包」的具体含义**：是否必须是 RTP 打包，抑或允许自定义包 / 容器帧 / 仅长度前缀分帧等（在拍板前，环回只需「可发送/接收的数据单元」）
 6. 音路径与视路径的先后顺序
 7. ~~短文的目录约定与模板细则~~ → **已决（issue 01）**：见 Implementation Decisions「文档与代码布局」
@@ -130,3 +130,4 @@ Status: ready-for-agent
 - 2026-10-20: 修订——jitter buffer / A/V 同步同 AEC 档；WebRTC 对照定为硬要求并与 H8 对齐；「打包」是否 RTP 列入未决。
 - 2026-10-20: `/grill-me` on issue 01——收口原未决 7/8/10/11（目录/模板、CMake+experiments 骨架、当时不引入测试框架、确认 per-stage 主缝）；细节见 `issues/01-learning-harness.md`。
 - 2026-10-20: `/retro`——文件改名为 `spec.md`（对齐 issue-tracker）；推翻「不引入测试框架」，引入 Catch2 + `scripts/check-learning.sh`，并补 01 占位产物测试。
+- 2026-10-20: `/grill-with-docs` on issue 02——音频·采集选定 Core Audio / AudioQueue、PCM/WAV 契约与验收边界；未决 #4 仅部分收口；见 `issues/02-audio-capture.md` 与 `docs/adr/0001-learning-audio-capture-coreaudio.md`。
