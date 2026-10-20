@@ -135,3 +135,4 @@ Status: ready-for-agent
 - 2026-10-20: `/retro`（issue 02 会话）——护栏接入 pre-commit + GitHub Actions；FetchContent 缓存与增量 build；`.cursorignore`；harness/短文写明系统框架与非沙箱麦烟测；tdd/implement/code-review 技能收紧 grilled seams 与 working-tree 审查。
 - 2026-10-20: `/retro`——Learning 阶段票收官必写课记 `{stage}.notes.md`（模板 `_notes_template.md`）；样例 `docs/learning/audio/capture.notes.md`；`/implement` 与 harness/AGENTS 已接线。
 - 2026-10-20: 文档分层瘦身——短文只验收；课记为阶段契约 SSOT；`lessons/`+`reference/` 属 `/teach`，链课记不另写契约。
+- 2026-10-20: `/teach` 教室迁入 `teach/`（与 `docs/` 分离）；见 `teach/README.md`。

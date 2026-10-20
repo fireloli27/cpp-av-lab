@@ -32,9 +32,9 @@ Learning Project 的文档与实验地基。正式 Client AV SDK / Media Server 
 | --- | --- | --- |
 | 短文 | `docs/learning/{audio\|video}/{stage}.md` | 怎么跑、怎么验收（主缝） |
 | 课记 | 同目录 `{stage}.notes.md` | **本阶段契约 + 代码地图**（改格式数字先改这里） |
-| teach 课 / 速查 | 仓库根 `lessons/`、`reference/`（`/teach`） | 概念教学与测验；**非** Learning 硬毕业交付 |
+| teach 教室 | `teach/`（见 [`teach/README.md`](../../../teach/README.md)） | 个人进修：MISSION / lessons / reference；**非** Learning 硬毕业交付 |
 
-Learning Pipeline Stage 票 `/implement` 收官必写课记（六栏）；harness 占位不要求课记。契约与概念不要在短文/课记/lesson 三处各写一套：短文引用课记；lesson 链课记；速查镜像课记并注明以课记为准。
+Learning Pipeline Stage 票 `/implement` 收官必写课记（六栏）；harness 占位不要求课记。契约与概念不要在短文/课记/教室三处各写一套：短文引用课记；`teach/lessons` 链课记；速查镜像课记并注明以课记为准。
 
 ## 配置与编译
 

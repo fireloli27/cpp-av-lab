@@ -50,4 +50,4 @@ cmake --build experiments/build --target learning_audio_capture
 独立可执行入口 `learning_audio_capture`；人工按本文验收（听 WAV）。可无硬件契约见 `experiments/tests/test_capture_wav.cpp`；一键护栏 `./scripts/check-learning.sh`。
 
 - **课记（契约 + 代码地图）**：[capture.notes.md](./capture.notes.md)
-- **概念课（PCM≠WAV）**：[lessons/0001-pcm-samples-wav-box.html](../../../lessons/0001-pcm-samples-wav-box.html)（`/teach` 工作区，非本缝硬交付）
+- **概念课（PCM≠WAV）**：[teach/lessons/0001-pcm-samples-wav-box.html](../../../teach/lessons/0001-pcm-samples-wav-box.html)（`/teach` 教室，非本缝硬交付）

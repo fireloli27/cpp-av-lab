@@ -3,7 +3,7 @@
 短文（怎么跑、怎么验收）见 [capture.md](./capture.md)。  
 **本文件是本阶段格式契约与代码地图的权威来源**；改采样率/声道/位深先改这里（并同步代码常量），短文与 teach 课只引用。
 
-PCM / WAV 概念、字节账练习、G.711 辨析 → [lessons/0001](../../../lessons/0001-pcm-samples-wav-box.html) · [速查](../../../reference/pcm-wav-cheatsheet.html)。
+PCM / WAV 概念、字节账练习、G.711 辨析 → [课 0001](../../../teach/lessons/0001-pcm-samples-wav-box.html) · [速查](../../../teach/reference/pcm-wav-cheatsheet.html)。
 
 ## 这一课在管线哪
 
