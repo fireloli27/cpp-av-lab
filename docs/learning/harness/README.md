@@ -24,7 +24,7 @@ Learning Project 的文档与实验地基。正式 Client AV SDK / Media Server 
 | 阶段短文（02+） | `docs/learning/{audio\|video}/` 同名 `.md` |
 | 阶段课记（02+） | 同目录 `{stage}.notes.md`（与短文成对） |
 
-术语以仓库根 `GLOSSARY.md` 为准。Agent 搜索忽略 `experiments/build/`、`experiments/.fetchcontent/`、`out/`（见 `.cursorignore`）。
+术语以仓库根 `GLOSSARY.md` 为准。短文 / 课记：**正文中文**；路径、命令、目标名、GLOSSARY 术语与格式词（PCM、WAV、AudioQueue 等）**保留英文**（见根 `AGENTS.md` Doc language）。Agent 搜索忽略 `experiments/build/`、`experiments/.fetchcontent/`、`out/`（见 `.cursorignore`）。
 
 **短文 vs 课记 vs teach：**
 

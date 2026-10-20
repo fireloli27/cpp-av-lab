@@ -12,13 +12,17 @@ Canonical roles map 1:1 to tracker labels (`needs-triage`, `needs-info`, `ready-
 
 Single-context: root `GLOSSARY.md` + `docs/adr/`. See `docs/agents/domain.md`.
 
+### Doc language
+
+Prose in **Chinese**. Keep **English** for GLOSSARY terms, API/type names, paths, commands, and format tokens (e.g. PCM, WAV, AudioQueue, s16le). Do not hard-translate those into Chinese as the primary label.
+
 ### Learning Project
 
-Experiments, essay + **课记** layout, and the Catch2/CTest guardrail: `docs/learning/harness/README.md`. Stage tickets: short essay `{stage}.md` (run/accept) + notes `{stage}.notes.md` (understand code). Templates: `_template.md`, `_notes_template.md`. One-command check: `./scripts/check-learning.sh`. Enable commit hook: `./scripts/install-git-hooks.sh`.
+Experiments, essay + **课记** layout, and the Catch2/CTest guardrail: `docs/learning/harness/README.md`. Stage tickets: short essay `{stage}.md` (run/accept) + notes `{stage}.notes.md` (understand code). Templates: `_template.md`, `_notes_template.md`. One-command check: `./scripts/check-learning.sh`. Enable commit hook: `./scripts/install-git-hooks.sh`. Follow Doc language above.
 
 ### Teach classroom
 
-Personal `/teach` workspace lives under `teach/` (not mixed with `docs/`). Map: `teach/README.md`.
+Personal `/teach` workspace lives under `teach/` (not mixed with `docs/`). Map: `teach/README.md`. Same Doc language rule for lessons and reference HTML.
 
 ### Git
 

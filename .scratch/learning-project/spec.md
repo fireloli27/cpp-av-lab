@@ -136,3 +136,4 @@ Status: ready-for-agent
 - 2026-10-20: `/retro`——Learning 阶段票收官必写课记 `{stage}.notes.md`（模板 `_notes_template.md`）；样例 `docs/learning/audio/capture.notes.md`；`/implement` 与 harness/AGENTS 已接线。
 - 2026-10-20: 文档分层瘦身——短文只验收；课记为阶段契约 SSOT；`lessons/`+`reference/` 属 `/teach`，链课记不另写契约。
 - 2026-10-20: `/teach` 教室迁入 `teach/`（与 `docs/` 分离）；见 `teach/README.md`。
+- 2026-10-20: 文档语言钉死——正文中文、术语/路径/命令英文；写入 `AGENTS.md` Doc language 与 `teach/README.md`。

@@ -14,4 +14,6 @@
 
 **桥到工程：** 阶段契约与代码地图仍以 `docs/learning/.../*.notes.md` 为准；课只链接过去。
 
+**语言：** 讲解正文用中文；术语 / API / 路径 / 命令 / 格式词保留英文（PCM、WAV、AudioQueue、ASBD、s16le 等），不硬翻成主标题。与仓库根 `AGENTS.md`「Doc language」一致。
+
 从仓库根跑 `/teach` 时，把本目录当作教学工作区（或在对话里说明 workspace = `teach/`）。

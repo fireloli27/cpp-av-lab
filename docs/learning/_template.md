@@ -1,5 +1,7 @@
 # 〈阶段短文标题〉
 
+正文中文；路径 / 命令 / 目标名 / GLOSSARY 术语与格式词保留英文（见 `AGENTS.md` Doc language）。
+
 ## 目标
 
 对应哪一段 Learning Pipeline Stage（采集 / 编码 / 本地传输/打包 / 解码 / 渲染），音或视，要验证什么概念。
