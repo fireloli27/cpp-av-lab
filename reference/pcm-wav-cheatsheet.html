@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference: PCM / WAV</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>PCM / WAV 速查</h1>
+      <p class="lede">
+        压缩表。仓库采集契约以
+        <a href="../docs/learning/audio/capture.notes.md">课记</a>
+        为准；出处见
+        <a href="../RESOURCES.md">RESOURCES.md</a>。
+      </p>
+
+      <h2>一句话</h2>
+      <ul class="tight">
+        <li><strong>PCM</strong>：样本布局（率 × 声道 × 位深 × 端序）。</li>
+        <li>
+          <strong>WAV (PCM)</strong>：RIFF；<code>fmt</code> 描述，
+          <code>data</code> 装样本。
+        </li>
+      </ul>
+
+      <h2>公式</h2>
+      <pre>nBlockAlign     = channels × (bits/8)
+nAvgBytesPerSec = sampleRate × nBlockAlign</pre>
+
+      <h2>当前采集契约（镜像课记；改数字先改课记）</h2>
+      <pre>48_000 Hz · mono · s16le
+byte_rate = 96_000 B/s
+path = out/audio/capture/capture.wav</pre>
+
+      <h2>WAVEFORMATEX（PCM）</h2>
+      <pre>wFormatTag      = 1
+nChannels / nSamplesPerSec / wBitsPerSample
+nBlockAlign     = channels × bits/8
+nAvgBytesPerSec = rate × nBlockAlign</pre>
+      <p class="callout">
+        <a
+          href="https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex"
+          >WAVEFORMATEX</a
+        >
+      </p>
+
+      <h2>RIFF 骨架</h2>
+      <pre>RIFF &lt;size&gt; WAVE
+  fmt  …
+  data …PCM…</pre>
+      <p class="callout">
+        <a
+          href="https://learn.microsoft.com/en-us/windows/win32/xaudio2/resource-interchange-file-format--riff-"
+          >RIFF overview</a
+        >
+      </p>
+
+      <h2>Core Audio</h2>
+      <ul class="tight">
+        <li>sample → 单声道一值</li>
+        <li>frame → 同时刻各声道</li>
+        <li>packet → 线性 PCM 常 = 1 frame</li>
+      </ul>
+
+      <h2>别混 G.711</h2>
+      <p>
+        <a href="https://www.itu.int/rec/T-REC-G.711">G.711</a>：8 kHz /
+        8-bit A-law|µ-law ≠ 线性 s16le。
+      </p>
+
+      <footer>
+        <a href="../lessons/0001-pcm-samples-wav-box.html">课 0001</a>
+        ·
+        <a href="../docs/learning/audio/capture.notes.md">课记</a>
+        ·
+        <a href="../docs/learning/audio/capture.md">短文</a>
+      </footer>
+    </main>
+  </body>
+</html>

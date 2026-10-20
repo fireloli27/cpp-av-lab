@@ -26,7 +26,15 @@ Learning Project 的文档与实验地基。正式 Client AV SDK / Media Server 
 
 术语以仓库根 `GLOSSARY.md` 为准。Agent 搜索忽略 `experiments/build/`、`experiments/.fetchcontent/`、`out/`（见 `.cursorignore`）。
 
-**短文 vs 课记：** 短文是主缝验收文档；课记给人读懂实现并沉淀知识。Learning Pipeline Stage 票（`.scratch/learning-project/issues/` 下音/视五段）在 `/implement` 收官时必须写或更新对应课记（六栏齐全，见课记模板）；harness 占位票不要求课记。
+**短文 vs 课记 vs teach：**
+
+| 层 | 路径 | 权威写什么 |
+| --- | --- | --- |
+| 短文 | `docs/learning/{audio\|video}/{stage}.md` | 怎么跑、怎么验收（主缝） |
+| 课记 | 同目录 `{stage}.notes.md` | **本阶段契约 + 代码地图**（改格式数字先改这里） |
+| teach 课 / 速查 | 仓库根 `lessons/`、`reference/`（`/teach`） | 概念教学与测验；**非** Learning 硬毕业交付 |
+
+Learning Pipeline Stage 票 `/implement` 收官必写课记（六栏）；harness 占位不要求课记。契约与概念不要在短文/课记/lesson 三处各写一套：短文引用课记；lesson 链课记；速查镜像课记并注明以课记为准。
 
 ## 配置与编译
 

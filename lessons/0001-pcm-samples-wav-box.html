@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0001 · PCM 是样本，WAV 是盒子</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>PCM 是样本，WAV 是盒子</h1>
+      <p class="lede">
+        一课目标：分清「样本布局」与「文件容器」，并会用采集契约算 1
+        秒裸 PCM 字节数。
+      </p>
+      <div class="meta">
+        <code>/teach</code> 课 · 绑定 Learning「采集」·
+        <a href="../MISSION.md">MISSION.md</a> ·
+        <a href="../docs/learning/audio/capture.notes.md">课记（契约权威）</a> ·
+        <a href="../reference/pcm-wav-cheatsheet.html">速查</a> ·
+        <a href="../docs/learning/audio/capture.md">短文（怎么跑）</a>
+      </div>
+
+      <h2>知识：两个不同的词</h2>
+      <p>
+        <strong>PCM</strong>：样本怎么数字化、怎么排（采样率、声道、位深、端序）。不是文件格式；内存里可以是
+        <code>vector&lt;int16_t&gt;</code>。
+      </p>
+      <p>
+        <strong>WAV</strong>（本语境）：<strong>RIFF/WAVE 容器</strong>——
+        <code>fmt </code> 写明格式，
+        <code>data</code> 装着 PCM 字节。见
+        <a
+          href="https://learn.microsoft.com/en-us/windows/win32/xaudio2/resource-interchange-file-format--riff-"
+          >Microsoft RIFF</a
+        >
+        /
+        <a
+          href="https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex"
+          >WAVEFORMATEX</a
+        >。
+      </p>
+
+      <div class="diagram">麦克风 → 线性 PCM 样本串 → 装进 WAV（fmt + data）→ *.wav</div>
+
+      <p class="callout">
+        Core Audio：sample / frame / packet 定义见
+        <a
+          href="https://developer.apple.com/documentation/coreaudiotypes/audiostreambasicdescription"
+          >ASBD</a
+        >。本仓库采集为 mono 线性 PCM 时，一帧 = 一个
+        <code>int16</code>。实现细节只维护在课记，不在本课复制代码表。
+      </p>
+
+      <h2>知识：用契约算字节账</h2>
+      <p>
+        数字以课记「契约」表为准（当前：48&nbsp;kHz · mono · s16le）。公式：
+      </p>
+      <pre>nBlockAlign     = channels × (bits/8)
+nAvgBytesPerSec = sampleRate × nBlockAlign</pre>
+      <p>
+        代入当前契约 → 2 字节/帧、
+        <strong>96 000 B/s</strong> 裸 PCM。公式字段对应 WAVEFORMATEX；若课记改了采样率，重算这里，不要两处各写死一套。
+      </p>
+
+      <h2>知识：别把「PCM」当成 G.711</h2>
+      <p>
+        <a href="https://www.itu.int/rec/T-REC-G.711">ITU-T G.711</a>
+        也叫 PCM，但是 8&nbsp;kHz + 8-bit A-law/µ-law。仓库采集是<strong
+          >线性 s16le</strong
+        >。口头说 PCM 时先问清哪一种。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="b"
+          data-ok="对：PCM 在 data 里。"
+          data-bad="再想：fmt 是说明书，data 是肉。"
+        >
+          <fieldset>
+            <legend>1. PCM 样本主要躺在 WAV 的哪一段？</legend>
+            <label
+              ><input type="radio" name="q1" value="a" /> fmt chunk
+              文本说明里</label
+            >
+            <label
+              ><input type="radio" name="q1" value="b" /> data chunk
+              的字节载荷里</label
+            >
+            <label
+              ><input type="radio" name="q1" value="c" /> 文件名 wav
+              后缀里</label
+            >
+            <label
+              ><input type="radio" name="q1" value="d" /> CMake
+              目标名字符串里</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="c"
+          data-ok="对：rate × 2 = 96000（当前契约）。"
+          data-bad="nAvgBytesPerSec = rate × blockAlign。"
+        >
+          <fieldset>
+            <legend>
+              2. 当前采集契约下，1 秒裸 PCM（不含头）大约多少字节？
+            </legend>
+            <label><input type="radio" name="q2" value="a" /> 48 000</label>
+            <label><input type="radio" name="q2" value="b" /> 16 000</label>
+            <label><input type="radio" name="q2" value="c" /> 96 000</label>
+            <label><input type="radio" name="q2" value="d" /> 192 000</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="a"
+          data-ok="对：同叫 PCM，编码不同。"
+          data-bad="采集不是 G.711。"
+        >
+          <fieldset>
+            <legend>3. 下列哪句正确？</legend>
+            <label
+              ><input type="radio" name="q3" value="a" />
+              线性 s16le 与 G.711 都可称 PCM，但编码不同</label
+            >
+            <label
+              ><input type="radio" name="q3" value="b" />
+              本课 WAV 里装的就是 G.711 A-law</label
+            >
+            <label
+              ><input type="radio" name="q3" value="c" />
+              PCM 等于必须是 44.1 kHz 立体声</label
+            >
+            <label
+              ><input type="radio" name="q3" value="d" />
+              去掉 .wav 后缀样本就消失了</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（可选）</h2>
+      <p>
+        打开课记确认契约表，再在
+        <code>experiments/tests/test_capture_wav.cpp</code>
+        找到与 byte rate 对应的字面量断言。
+      </p>
+
+      <h2>指定精读</h2>
+      <p>
+        <a
+          href="https://learn.microsoft.com/en-us/windows/win32/xaudio2/resource-interchange-file-format--riff-"
+          >Microsoft RIFF overview</a
+        >
+        — 盯住 <code>RIFF</code> / <code>fmt</code> / <code>data</code>。
+      </p>
+
+      <footer>
+        问老师（对话里的 agent）。书单：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>
