@@ -34,4 +34,4 @@ CMake 配置/编译错误原文；若编译成功但未生成 `out/harness/place
 
 ## 与主缝关系
 
-本入口为 harness 占位的独立可执行文件 `learning_placeholder`；人工按本文步骤验收。后续各 Learning Pipeline Stage 实验沿用同一模式（各自入口 + 短文判据），不依赖统一 pipeline runner。
+本入口为 harness 占位的独立可执行文件 `learning_placeholder`；人工按本文步骤验收。可观察产物契约另由 `experiments/tests/test_placeholder_artifact.cpp`（Catch2）覆盖，一键入口见 `scripts/check-learning.sh`。后续各 Learning Pipeline Stage 实验沿用「各自入口 + 短文判据」；自动化测试只护可无硬件复现的契约。

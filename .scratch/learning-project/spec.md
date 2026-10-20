@@ -63,24 +63,29 @@ Status: ready-for-agent
 - **WebRTC 对照（硬要求，与 H8 对齐）**：毕业必须有 ≥1 篇对照短文，将五段及叙述必会的旁路模块映射到 WebRTC / libwebrtc（或等价完整栈）中的对应概念。**「改得动 WebRTC」不是毕业条件**，也不算加分门槛。
 - **叙述必会、硬实验不加（同档）**：AEC、弱网码率自适应、jitter buffer、A/V 同步——毕业叙述必须说明其在管线中的位置与作用；不要求单独硬实验或调通；动手验证属加分包。
 - **信令概念（学习文档必写清）**：Call Signaling 归 Host App；Media Signaling 为 SDK↔SFU；二者分离。Media Signaling 的承载通道不在本 spec 决定。
-- **主测试缝（已决，issue 01）**：以「阶段实验」为唯一主缝——每一 Learning Pipeline Stage 提供一个可从仓库外部运行的实验入口，输入/前置条件写在短文里，成功时有可观察输出（原始帧文件、码流文件、环回收包统计、解码帧、可听见/可见的渲染等）；人工按短文验收。WebRTC 对照以短文叙述验收，不另开代码缝。不做统一 pipeline runner；不引入自动化测试框架（除非日后另开票推翻）。
+- **主测试缝（已决，issue 01；测试护栏经 retro 修订）**：以「阶段实验」为产品主缝——每一 Learning Pipeline Stage 提供一个可从仓库外部运行的实验入口，输入/前置条件写在短文里，成功时有可观察输出；**人工按短文验收**仍为一等公民。另以 **Catch2 + CTest** 护住可自动化的可观察契约（见 Testing Decisions）。WebRTC 对照以短文叙述验收，不另开代码缝。不做统一 pipeline runner。
 - **文档与代码布局（已决，issue 01）**：
   - 短文根：`docs/learning/`；模板：`docs/learning/_template.md`（必填：目标、前置、选用库、运行步骤、可观察成功判据、失败时仍记录什么、与主缝关系）。正文中文；路径/命令/目标名/GLOSSARY 术语不硬翻。
   - 阶段短文/实验镜像：`docs/learning/{audio|video}/{capture,encode,local-transport,decode,render}.md` ↔ `experiments/{audio|video}/{同名}/`。
   - CMake 根：`experiments/`（CMake ≥ 3.20，C++17）；构建目录 `experiments/build/`；可观察产物写在仓库根下 `out/`；运行约定 cwd＝仓库根。仓库根 `.gitignore` 忽略 `build/`、`experiments/build/`、`out/`、`.DS_Store`。
-  - harness 地基（非管线阶段）：`experiments/harness/placeholder/`（目标名 `learning_placeholder`）+ `docs/learning/harness/` 总览与样例短文。01 不预建空的音/视阶段目录；不抽共享 C++ 库。
+  - harness 地基（非管线阶段）：`experiments/harness/placeholder/`（目标名 `learning_placeholder`）+ `docs/learning/harness/` 总览与样例短文。01 不预建空的音/视阶段目录；不抽跨阶段 `experiments/common`；占位可抽本目录内小静态库供可执行文件与测试链接。
+  - 自动化测试：`experiments/tests/`（Catch2 经 FetchContent）；仓库护栏命令：`scripts/check-learning.sh`（configure + build + ctest）。
 - **文档与代码关系**：短文是一等公民；实验为短文服务。演示优先或半吊子产品化不得压过文档。
 - **不写排期清单**：时间窗口仅作假设（约每周 10–15h，约 4–8 周），本 spec 不展开周序任务表。
 
 ## Testing Decisions
 
 - **好测试的定义（对本学习工程）**：只验收外部可观察行为与文档承诺，不验收某库内部私有结构是否「优雅」。
-- **主缝验收**：
+- **主缝验收（人工）**：
   - 对每一硬范围阶段：实验可按短文步骤运行；成功判据在短文中写明且可人为确认。
   - 音、视路径：至少各有一条从采集到渲染的贯通证据（可分段拼接，但缺口处必须在文档标明）。
+- **自动化护栏（已决，retro 2026-10-20）**：
+  - 框架：**Catch2**（CMake FetchContent）+ **CTest**；入口 `./scripts/check-learning.sh`。
+  - 测什么：可在无硬件/无权限环境下复现的可观察契约（例如 harness 占位写出约定路径与内容）。麦克风/摄像头等需人工的成功判据仍以短文为准，不强行自动化。
+  - 01 已覆盖：`write_placeholder_artifact` 在给定 root 下写出 `out/harness/placeholder-ok.txt`，内容为 `learning_placeholder: ok\n`（与样例短文判据一致）。
 - **叙述验收（人工）**：作者能按五段讲解管线；安放 AEC、弱网码率自适应、jitter buffer、A/V 同步的位置与作用；说明 Client AV SDK、Call Signaling、Media Signaling、SFU 的职责边界；并完成 WebRTC 对照短文（硬）。
 - **加分包**：双端互通、SFU 实验、网络真实感、AEC / jitter buffer / A/V 同步 / 弱网自适应动手——有则记，无则不影响 Learning Exit Criteria。
-- **Prior art**：仓库尚无既有测试体系；本决策即基线。已决不引入自动化测试框架（issue 01）；若日后要框架或 one-command 脚本化验收，另开票推翻。
+- **Prior art**：经 `/retro` 推翻「不引入测试框架」的早期基线；以 Catch2 + `scripts/check-learning.sh` 为新基线。
 
 ## Out of Scope
 
@@ -113,8 +118,8 @@ Status: ready-for-agent
 7. ~~短文的目录约定与模板细则~~ → **已决（issue 01）**：见 Implementation Decisions「文档与代码布局」
 8. ~~实验目录命名与构建系统选型~~ → **已决（issue 01）**：`experiments/` + CMake ≥ 3.20 / C++17；阶段 slug 见上
 9. 何时从 matt 单体拆出专用代码仓的触发条件
-10. ~~是否引入自动化测试框架 / one-command 验收~~ → **已决（issue 01）**：不引入；脚本化若需要另开票
-11. ~~主测试缝是否改为统一 pipeline runner~~ → **已决（issue 01）**：维持每阶段各自入口 + 人工按短文验收
+10. ~~是否引入自动化测试框架 / one-command 验收~~ → **已决（retro 2026-10-20）**：Catch2 + CTest；`scripts/check-learning.sh`；见 Testing Decisions
+11. ~~主测试缝是否改为统一 pipeline runner~~ → **已决（issue 01）**：维持每阶段各自入口 + 人工按短文验收（自动化护栏不替代人工短文缝）
 12. 加分包的触发条件与是否在收官后另开学习专项
 13. 时间窗口在「约 4–8 周」内的实际取舍与起止日期
 14. WebRTC 对照所针对的具体发行版 / 文档基线（在「对照短文」硬要求之下的材料选型）
@@ -123,4 +128,5 @@ Status: ready-for-agent
 
 - 2026-10-20: grilling + 对照表定稿后由 `/to-spec` 发布；Status = ready-for-agent。
 - 2026-10-20: 修订——jitter buffer / A/V 同步同 AEC 档；WebRTC 对照定为硬要求并与 H8 对齐；「打包」是否 RTP 列入未决。
-- 2026-10-20: `/grill-me` on issue 01——收口原未决 7/8/10/11（目录/模板、CMake+experiments 骨架、不引入测试框架、确认 per-stage 主缝）；细节见 `issues/01-learning-harness.md`。
+- 2026-10-20: `/grill-me` on issue 01——收口原未决 7/8/10/11（目录/模板、CMake+experiments 骨架、当时不引入测试框架、确认 per-stage 主缝）；细节见 `issues/01-learning-harness.md`。
+- 2026-10-20: `/retro`——文件改名为 `spec.md`（对齐 issue-tracker）；推翻「不引入测试框架」，引入 Catch2 + `scripts/check-learning.sh`，并补 01 占位产物测试。

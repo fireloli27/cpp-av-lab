@@ -5,7 +5,7 @@ Status: ready-for-agent
 产品愿景假设册。条目均为**假设**，非正式工程承诺。  
 「验证钩子」指向 Learning Project 中可用来证伪/加强该假设的实验或叙述验收；钩子标为「学习阶段不可验证」者，不得在学习工程里假装已拍板。
 
-关联定稿：`.scratch/learning-project/spec-learning.md`、根目录 `GLOSSARY.md`。
+关联定稿：`.scratch/learning-project/spec.md`、根目录 `GLOSSARY.md`。
 
 ---
 
@@ -50,5 +50,6 @@ Status: ready-for-agent
 
 ## Comments
 
-- 2026-10-20: 与 `spec-learning.md` 同时由 `/to-spec` 发布；假设与验证钩子按定稿对照表填写。
+- 2026-10-20: 与 `spec.md`（原 `spec-learning.md`）同时由 `/to-spec` 发布；假设与验证钩子按定稿对照表填写。
+- 2026-10-20: `/retro` 将 spec 文件改名为 `spec.md`，对齐 issue-tracker。
 - 2026-10-20: 修订——H8 与毕业标准统一为「WebRTC 对照短文 = 硬要求」；新增 H13/H14（jitter buffer、A/V 同步）；原 H13 顺延为 H15；U10 明确「打包」是否 RTP。
