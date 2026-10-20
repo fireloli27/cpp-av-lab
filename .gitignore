@@ -2,7 +2,11 @@
 build/
 experiments/build/
 
+# FetchContent cache (Catch2 source; survives wiping experiments/build/)
+experiments/.fetchcontent/
+
 # Learning experiment observable outputs (cwd = repo root)
 out/
 
 .DS_Store
+

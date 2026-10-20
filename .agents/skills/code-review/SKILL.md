@@ -16,11 +16,16 @@ The issue tracker should have been provided to you. If not, tell the user to run
 
 ### 1. Pin the fixed point
 
-Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
+Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, **working-tree**, etc.). If they didn't specify one, ask for it. When invoked from `/implement` before commit, default to **working-tree**.
 
-Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
+**Committed range** (branch / SHA / tag): capture `git diff <fixed-point>...HEAD` (three-dot, merge-base) and `git log <fixed-point>..HEAD --oneline`. Confirm `git rev-parse <fixed-point>` and a non-empty diff.
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
+**Working-tree** (uncommitted review): fixed point is the current `HEAD`. Capture:
+
+- `git diff HEAD` (tracked changes)
+- `git status -u --short` and read each untracked path that is part of the change
+
+Treat that combined tree as the diff. Empty working tree (clean status) fails here the same way an empty commit range does.
 
 ### 2. Identify the spec source
 

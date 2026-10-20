@@ -131,3 +131,4 @@ Status: ready-for-agent
 - 2026-10-20: `/grill-me` on issue 01——收口原未决 7/8/10/11（目录/模板、CMake+experiments 骨架、当时不引入测试框架、确认 per-stage 主缝）；细节见 `issues/01-learning-harness.md`。
 - 2026-10-20: `/retro`——文件改名为 `spec.md`（对齐 issue-tracker）；推翻「不引入测试框架」，引入 Catch2 + `scripts/check-learning.sh`，并补 01 占位产物测试。
 - 2026-10-20: `/grill-with-docs` on issue 02——音频·采集选定 Core Audio / AudioQueue、PCM/WAV 契约与验收边界；未决 #4 仅部分收口；见 `issues/02-audio-capture.md` 与 `docs/adr/0001-learning-audio-capture-coreaudio.md`。
+- 2026-10-20: `/retro`（issue 02 会话）——护栏接入 pre-commit + GitHub Actions；FetchContent 缓存与增量 build；`.cursorignore`；harness/短文写明系统框架与非沙箱麦烟测；tdd/implement/code-review 技能收紧 grilled seams 与 working-tree 审查。

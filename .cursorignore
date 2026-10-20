@@ -1,0 +1,9 @@
+# Build trees and FetchContent caches — keep agent search on sources.
+build/
+experiments/build/
+experiments/.fetchcontent/
+
+# Observable experiment outputs
+out/
+
+.DS_Store

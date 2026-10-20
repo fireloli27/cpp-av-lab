@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Learning Project guardrail: block commits that fail the one-command check.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+exec "${ROOT}/scripts/check-learning.sh"

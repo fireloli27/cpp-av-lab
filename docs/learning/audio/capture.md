@@ -12,6 +12,7 @@ AEC（回声消除）属叙述必会旁路，通常落在采集之后、编码�
 - 在仓库根（`matt/`）作为 cwd
 - **麦克风权限**：系统设置 → 隐私与安全性 → 麦克风 → 允许你使用的终端（Terminal / iTerm 等）
 - 系统有可用的默认输入设备
+- Agent 烟测（真采麦）须在非沙箱环境执行（`required_permissions: ["all"]`）；`./scripts/check-learning.sh` 不测麦克风
 
 ## 选用库
 

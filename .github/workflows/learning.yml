@@ -1,0 +1,14 @@
+name: learning
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  check-learning:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guardrail
+        run: ./scripts/check-learning.sh
