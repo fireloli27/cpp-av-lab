@@ -9,7 +9,7 @@ Learning Pipeline Stages 的**编码**（音频）：**PCM 样本 → 压缩码�
 
 - **上游**：采集产物 `out/audio/capture/capture.wav`（或短文写明的等价 48 kHz mono s16le PCM WAV）
 - **本段产出**：`out/audio/encode/encode.caf`（CAF 容器内为 Opus 码流）
-- **下游**：音频「本地传输/打包」默认以该 CAF（或短文写明的等价码流单元）为可追溯输入（见 issue 04）；打包是否 RTP 仍未决
+- **下游**：音频「本地传输/打包」默认吃该 CAF；学习选型见 [local-transport.notes.md](./local-transport.notes.md) 与 ADR-0003；产品是否必须 RTP 仍未决
 
 AEC 属叙述必会旁路，通常在采集后、编码前；弱网码率自适应依赖网络反馈作用于编码码率——本阶段实验不实现。
 
@@ -71,4 +71,4 @@ Catch2 用合成 1 s 音调 PCM 断言：文件非空、`mFormatID == 'opus'`、
 
 ## 下一课钩子
 
-**04 音频·本地传输/打包**默认吃 `out/audio/encode/encode.caf`（或短文写明的等价码流单元）。「打包」是否必须 RTP 仍为 spec 未决；环回只需可发送/接收的数据单元。
+**04 音频·本地传输/打包**默认吃 `out/audio/encode/encode.caf`（或短文写明的等价码流单元）。学习选型见 ADR-0003（长度前缀 Transport Unit + UDP loopback）；产品「是否必须 RTP」仍为 spec 未决 #5 / U10。

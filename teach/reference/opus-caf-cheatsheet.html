@@ -53,7 +53,7 @@ bitrate_bps = 64_000（固定）
 API = AudioConverter + AudioFileWritePackets</pre>
 
       <h2>管线位置</h2>
-      <pre>采集 PCM → [AEC 旁路·本票不做] → 编码 Opus → [打包/RTP·04] → …</pre>
+      <pre>采集 PCM → [AEC 旁路·本票不做] → 编码 Opus → [本地传输/打包·04 Transport Unit] → …</pre>
 
       <h2>相关课</h2>
       <ul class="tight">

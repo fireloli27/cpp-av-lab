@@ -113,8 +113,8 @@ Status: ready-for-agent
 1. Media Signaling 的承载通道（复用 IM / 独立 WebSocket 或 HTTP / 随媒体通道 / 其他）
 2. Media Server（SFU）具体实现路线（自研比例 vs 开源改造选型）
 3. 部署形态（私有化 / 公有云多租户 / 两者）
-4. 五段实验各自的具体库与 API 选型（采集、编码、传输/打包、解码、渲染）——**部分**：音频·采集已选 Core Audio / AudioQueue（issue 02、ADR-0001）；音频·编码已选 AudioToolbox / `AudioConverter` + Opus → CAF（issue 03、ADR-0002）；其余阶段仍未决
-5. **阶段 3「打包」的具体含义**：是否必须是 RTP 打包，抑或允许自定义包 / 容器帧 / 仅长度前缀分帧等（在拍板前，环回只需「可发送/接收的数据单元」）
+4. 五段实验各自的具体库与 API 选型（采集、编码、传输/打包、解码、渲染）——**部分**：音频·采集已选 Core Audio / AudioQueue（issue 02、ADR-0001）；音频·编码已选 AudioToolbox / `AudioConverter` + Opus → CAF（issue 03、ADR-0002）；音频·本地传输/打包已选 AudioToolbox 读包 + 长度前缀 Transport Unit + POSIX UDP loopback（issue 04、ADR-0003）；其余阶段仍未决
+5. **阶段 3「打包」的具体含义（产品 / 是否必须 RTP）**：仍未决（U10）。**学习音频实验**已选自定义长度前缀（非 RTP）作为本机环回单元（issue 04、ADR-0003）；该选型**不**视为对本条的产品拍板
 6. 音路径与视路径的先后顺序
 7. ~~短文的目录约定与模板细则~~ → **已决（issue 01）**：见 Implementation Decisions「文档与代码布局」
 8. ~~实验目录命名与构建系统选型~~ → **已决（issue 01）**：`experiments/` + CMake ≥ 3.20 / C++17；阶段 slug 见上
@@ -138,3 +138,4 @@ Status: ready-for-agent
 - 2026-10-20: `/teach` 教室迁入 `teach/`（与 `docs/` 分离）；见 `teach/README.md`。
 - 2026-10-20: 文档语言钉死——正文中文、术语/路径/命令英文；写入 `AGENTS.md` Doc language 与 `teach/README.md`。
 - 2026-10-22: `/grill-with-docs` on issue 03——音频·编码选定 Opus + `AudioConverter`、CAF 产物与验收边界；未决 #4 再部分收口；见 `issues/03-audio-encode.md` 与 `docs/adr/0002-learning-audio-encode-opus-audioconverter.md`；Glossary「编码」区分 PCM 与压缩码流。
+- 2026-10-22: `/grill-with-docs` on issue 04——音频·本地传输/打包选定长度前缀 Transport Unit + UDP loopback（非产品 RTP 拍板）；未决 #4 再部分收口；未决 #5 产品侧仍开、学习音频实验选型见 ADR-0003；Glossary 增补 Transport Unit；见 `issues/04-audio-local-transport.md`。

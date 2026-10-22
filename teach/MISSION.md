@@ -20,5 +20,5 @@
 ## Out of scope（本轮）
 
 - Opus 内部 SILK/CELT 细节、自己实现编码器
-- RTP / SRTP 打包（留给 04）
+- 本地传输/打包（issue 04：长度前缀 Transport Unit + UDP；产品是否必须 RTP 仍未决）
 - AAC 选型对比深挖、AEC / 弱网动手调参
