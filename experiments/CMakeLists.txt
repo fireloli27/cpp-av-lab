@@ -9,6 +9,7 @@ include(CTest)
 
 add_subdirectory(harness/placeholder)
 add_subdirectory(audio/capture)
+add_subdirectory(audio/encode)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

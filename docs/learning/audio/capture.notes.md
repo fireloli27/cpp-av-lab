@@ -65,4 +65,4 @@ WAV：`fmt` 描述格式，`data` 装 PCM。Catch2 用字面量断言头字段�
 
 ## 下一课钩子
 
-**03 音频·编码**默认读 `out/audio/capture/capture.wav`（或短文写明的等价输入）。编码库未决。
+**03 音频·编码**默认读 `out/audio/capture/capture.wav`（或短文写明的等价输入）。库选型见 issue 03 / ADR-0002（Opus + `AudioConverter` → `encode.caf`）。
