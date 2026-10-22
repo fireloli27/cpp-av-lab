@@ -18,7 +18,7 @@ Prose in **Chinese**. Keep **English** for GLOSSARY terms, API/type names, paths
 
 ### Learning Project
 
-Experiments, essay + **课记** layout, and the Catch2/CTest guardrail: `docs/learning/harness/README.md`. Stage tickets: short essay `{stage}.md` (run/accept) + notes `{stage}.notes.md` (understand code). Templates: `_template.md`, `_notes_template.md`. One-command check: `./scripts/check-learning.sh`. Enable commit hook: `./scripts/install-git-hooks.sh`. Follow Doc language above.
+Experiments, essay + **课记** layout, and the Catch2/CTest guardrail: `docs/learning/harness/README.md`（含 agent 跑护栏/commit 须非沙箱、Opus CAF 导航）. Stage tickets: short essay `{stage}.md` (run/accept) + notes `{stage}.notes.md` (understand code). Templates: `_template.md`, `_notes_template.md`. One-command check: `./scripts/check-learning.sh`. Enable commit hook: `./scripts/install-git-hooks.sh`. Review judgement: root `CODING_STANDARDS.md`. Follow Doc language above.
 
 ### Teach classroom
 

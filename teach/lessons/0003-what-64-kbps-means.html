@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0003 · 64 kbps 是什么意思</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>64 kbps 是什么意思</h1>
+      <p class="lede">
+        一课目标：把「码率 / bitrate」说成可算的量——每秒多少
+        <strong>bit</strong>，并会和仓库契约 PCM 字节账对照。
+      </p>
+      <div class="meta">
+        <code>/teach</code> 课 · 绑定 Learning「编码」·
+        <a href="../MISSION.md">MISSION.md</a> ·
+        <a href="../../docs/learning/audio/encode.notes.md">课记</a> ·
+        <a href="../reference/opus-caf-cheatsheet.html">速查</a> ·
+        <a href="./0002-opus-codec-caf-box.html">上节 0002</a>
+      </div>
+
+      <h2>知识：bitrate 是「水龙头开多大」</h2>
+      <p>
+        编码时的 <strong>bitrate</strong>（码率）≈ 编码器平均每秒允许往外吐多少
+        <strong>bit</strong> 的压缩结果。本仓库钉死
+        <code>kBitRateBps = 64000</code>，口头常说
+        <strong>64 kbps</strong>（kilobits per second）。
+      </p>
+      <p>
+        <a href="https://www.rfc-editor.org/rfc/rfc6716.html">RFC 6716</a>
+        §2.1.1：Opus 支持约 6–510&nbsp;kbit/s；同样条件下，码率越高通常质量越好。它给的是<strong>压缩码流</strong>的预算，不是采样率。
+      </p>
+      <div class="diagram">
+        PCM 样本（很多字节）→ 编码器按 bitrate 预算挤小 → 码流（少很多 bit/s）
+      </div>
+
+      <h2>知识：先分清 bit 与 byte</h2>
+      <pre>64 kbps = 64_000 bit/s
+÷ 8     =  8_000 byte/s   ← 载荷量级</pre>
+      <p>
+        同 1 秒内容：契约裸 PCM ≈ <strong>96 000 B</strong>（课记）；64&nbsp;kbps
+        Opus 载荷量级 ≈ <strong>8 000 B</strong>。CAF 文件还会多一点头。压缩比量级大约
+        96 000∶8 000 ≈ <strong>12∶1</strong>（只比量级，别当精确听感公式）。
+      </p>
+      <p class="callout">
+        弱网自适应会<strong>改这个水龙头</strong>（升/降 bitrate）。本票实验固定
+        64&nbsp;kbps，只叙述不实现。
+      </p>
+
+      <h2>知识：同是「64 kbps」，别和 G.711 撞车</h2>
+      <p>
+        电话
+        <a href="https://www.itu.int/rec/T-REC-G.711/en">G.711</a>：8&nbsp;kHz ×
+        8&nbsp;bit/样本 = <strong>64 kbit/s</strong>——那是<strong>未压缩</strong>（或仅压扩）电话
+        PCM 的自然数据率。你仓库的 64&nbsp;kbps 是
+        <strong>Opus 压缩目标码率</strong>，吃的是 48&nbsp;kHz 线性 s16le。数字碰巧一样，概念不是一路货。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="b"
+          data-ok="对：kbps 是每秒比特数。"
+          data-bad="bitrate 管的是压缩输出预算，不是采样率本身。"
+        >
+          <fieldset>
+            <legend>1. 「64 kbps」里的单位首先指什么？</legend>
+            <label
+              ><input type="radio" name="q1" value="a" />
+              每秒采样 64 000 个 PCM 点</label
+            >
+            <label
+              ><input type="radio" name="q1" value="b" />
+              每秒大约 64 000 个压缩 bit</label
+            >
+            <label
+              ><input type="radio" name="q1" value="c" />
+              文件固定正好 64 000 字节</label
+            >
+            <label
+              ><input type="radio" name="q1" value="d" />
+              CAF 容器最多 64 个 chunk</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="c"
+          data-ok="对：÷8 → 约 8000 B/s。"
+          data-bad="bit÷8=byte；别和 96000 PCM 混。"
+        >
+          <fieldset>
+            <legend>2. 64 kbps 换算成每秒大约多少字节？</legend>
+            <label><input type="radio" name="q2" value="a" /> 约 64 000</label>
+            <label><input type="radio" name="q2" value="b" /> 约 96 000</label>
+            <label><input type="radio" name="q2" value="c" /> 约 8 000</label>
+            <label><input type="radio" name="q2" value="d" /> 约 512</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="a"
+          data-ok="对：同数字，一个是电话 PCM 率，一个是 Opus 目标。"
+          data-bad="再想 0001：线性 PCM ≠ G.711。"
+        >
+          <fieldset>
+            <legend>3. G.711 的 64 kbit/s 与本票 Opus 64 kbps？</legend>
+            <label
+              ><input type="radio" name="q3" value="a" />
+              数字可相同，含义不是同一概念</label
+            >
+            <label
+              ><input type="radio" name="q3" value="b" />
+              完全等价，都是 48 kHz s16le</label
+            >
+            <label
+              ><input type="radio" name="q3" value="c" />
+              证明 encode.caf 其实是电话 PCM</label
+            >
+            <label
+              ><input type="radio" name="q3" value="d" />
+              说明必须用 libopus 才能到 64k</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（可选）</h2>
+      <p>
+        编码 1 秒输入后看日志 <code>bitrate_bps=64000</code> 与
+        <code>output_bytes</code>；再用
+        <code>afinfo</code> 看「audio bytes」是否落在约数千～一万量级（外加 CAF
+        头）。数字以课记为准。
+      </p>
+
+      <h2>指定精读</h2>
+      <p>
+        <a href="https://www.rfc-editor.org/rfc/rfc6716.html#section-2.1.1"
+          >RFC 6716 §2.1.1 Bitrate</a
+        >
+        — 读 sweet spots 那几行：语音常用带往往<strong>低于</strong> 64&nbsp;kbit/s；64
+        更靠近「全带单声道音乐」量级。本票选 64 是学习钉死值，不是唯一正确语音点。
+      </p>
+
+      <footer>
+        问老师（对话里的 agent）。书单：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

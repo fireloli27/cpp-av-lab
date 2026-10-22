@@ -58,6 +58,11 @@ TEST_CASE("encode caf writer emits non-empty Opus CAF from PCM",
   REQUIRE(stats.duration_s > 0.9);
   REQUIRE(stats.frames_per_packet > 0);
   REQUIRE(fs::file_size(out_path) == stats.output_bytes);
+  // Without DontPageAlignAudioData, CAF left ~240KB `free`; keep near bitrate envelope.
+  const auto max_bytes = static_cast<std::uint64_t>(
+      stats.duration_s * static_cast<double>(enc::kBitRateBps) / 8.0 * 4.0 +
+      16.0 * 1024.0);
+  REQUIRE(stats.output_bytes < max_bytes);
 
   const std::string path_str = out_path.string();
   CFURLRef url = CFURLCreateFromFileSystemRepresentation(

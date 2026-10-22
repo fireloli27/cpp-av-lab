@@ -1,24 +1,31 @@
-# PCM / WAV Resources
+# 音频编码 / Opus · CAF Resources
 
 ## Knowledge
 
-- [Microsoft Learn: Resource Interchange File Format (RIFF)](https://learn.microsoft.com/en-us/windows/win32/xaudio2/resource-interchange-file-format--riff-)
-  RIFF chunk 模型；WAV 里常见的 `RIFF` / `fmt ` / `data` FOURCC。Use for: 打开任意 `.wav` 时在脑子里画容器结构。
-- [Microsoft Learn: WAVEFORMATEX](https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex)
-  `nChannels`、`nSamplesPerSec`、`wBitsPerSample`、`nBlockAlign`、`nAvgBytesPerSec` 定义；PCM 时 `wFormatTag = WAVE_FORMAT_PCM`。Use for: 与本仓库 `fmt` 字段一一对照。
-- [Apple: AudioStreamBasicDescription](https://developer.apple.com/documentation/coreaudiotypes/audiostreambasicdescription)
-  Core Audio 对 sample / frame / packet 的定义；Linear PCM 时 `mFramesPerPacket = 1`。Use for: 读懂 issue 02 的 ASBD。
-- [ITU-T G.711](https://www.itu.int/rec/T-REC-G.711)
-  电话频带 PCM：8 kHz、8 bit、A-law/µ-law。Use for: **对照**——别把「PCM」只理解成 G.711；本课是线性 PCM。
-- Repo: `docs/learning/audio/capture.notes.md` + `experiments/audio/capture/capture_wav.cpp`
-  本仓库契约与实现（教室在 `teach/`，契约仍在课记）。Use for: 课内练习与验收挂钩。
+- [RFC 6716: Definition of the Opus Audio Codec](https://www.rfc-editor.org/rfc/rfc6716.html)
+  IETF 标准：交互式语音/音频编解码器；约 6 kbit/s–510 kbit/s 量级。Use for: 「Opus 是什么、为何适合通话」的一手定义，不必通读实现附录。
+- [RFC 6716 §2.1.1 Bitrate](https://www.rfc-editor.org/rfc/rfc6716.html#section-2.1.1)
+  码率控制参数与 sweet spots（语音/音乐量级）。Use for: 讲清「64 kbps」是压缩预算，以及它在 Opus 范围里偏哪一档。
+- [ITU-T G.711](https://www.itu.int/rec/T-REC-G.711/en)
+  8 kHz × 8 bit → 64 kbit/s 电话 PCM。Use for: **对照**——同数字「64k」不是 Opus 压缩目标码率。
+- [Apple: Core Audio Format (CAF) Overview](https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html)
+  CAF 是容器；必有 Description + Data；VBR/VFR 还需 Packet Table。Use for: 分清「盒子」与里面的 Opus 包。
+- [Apple: CAF Specification](https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_spec/CAF_spec.html)
+  chunk 布局（`desc` / `pakt` / `data` / `kuki` 等）。Use for: 对照 `afinfo` / 课记踩坑里的 `free`。
+- [Apple: AudioConverter](https://developer.apple.com/documentation/audiotoolbox/audioconverter-swift.struct)
+  系统 PCM ↔ 压缩格式转换入口。Use for: 理解本仓库为何用 `AudioConverter` 而不是 libopus C API。
+- Repo: `docs/learning/audio/encode.notes.md` + ADR-0002
+  本仓库编码契约与选型。Use for: 课内数字与路径；教室不另写一套。
+- Repo: `docs/learning/audio/capture.notes.md`
+  上游 PCM 契约。Use for: 编码输入从哪来。
 
 ## Wisdom (Communities)
 
 - [Hydrogenaudio Forums](https://hydrogenaud.io/index.php)
-  音频格式与编码器讨论，信号质量较高。Use for: 格式边界问题（何时用 float PCM、何时 WAV vs CAF）。
-- 可选：公司内音视频组同事 / code review——把「这文件是 PCM 还是容器」说清楚即为实战检验。
+  编码器/容器边界讨论较密。Use for: 「文件能播」vs「网上传的是裸 packet」这类概念题。
+- 可选：组内对照 WebRTC 文档里 Opus payload —— 实战检验「容器 vs 网上单元」。
 
 ## Gaps
 
-- 尚无单独精读「Nyquist 采样定理」一手教科书章节（后续课若讲抗混叠再补）。
+- Opus 官方实现与 RFC 附录对照精读（深挖 SILK/CELT 时再开）。
+- WebRTC 对照短文尚未写（Learning 硬毕业另票）。

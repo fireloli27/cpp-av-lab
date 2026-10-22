@@ -60,9 +60,18 @@ cmake --build experiments/build
 - 本机：`./scripts/install-git-hooks.sh`（设置 `core.hooksPath=scripts/githooks`，pre-commit 跑上述护栏）
 - GitHub Actions：`.github/workflows/learning.yml`（macOS）跑同一脚本
 
+**Agent 非沙箱（必读）：** Cursor agent 跑 `check-learning.sh`、或 `git commit`（触发 pre-commit）时须 `required_permissions: ["all"]`。原因：`experiments/build/` 与 `.fetchcontent/` 在 `.cursorignore` 里，沙箱常无法写入；且 Catch2 编码等测缝会调用系统 **AudioConverter** / **AudioFile**，沙箱内可能 `fmt?` 失败。CI 与本机终端不受此限。
+
 ## 人工媒体烟测（agent）
 
-录麦 / 开摄像头的可执行文件须在**非沙箱**环境跑（Cursor agent：`required_permissions: ["all"]`），并已给终端麦克风/摄像头权限。`check-learning.sh` 不能代替这一步。
+下列情况须在**非沙箱**跑（`required_permissions: ["all"]`）；`check-learning.sh` 不能代替听感/画面验收：
+
+- 录麦 / 开摄像头的可执行文件（并已给终端麦克风/摄像头权限）
+- 任意依赖 **AudioConverter** / **AudioFile** 编解码的本机烟测（例如 `learning_audio_encode` + `afplay`）
+
+## 写 Opus CAF（导航）
+
+音频编码产物约定见 [encode.notes.md](../audio/encode.notes.md)。实现要点：`AudioConverter` + `AudioFileWritePackets`；创建 CAF 时带 `kAudioFileFlags_DontPageAlignAudioData` 并写 magic cookie，否则易留下百 KB 级 `free` chunk。Catch2 对约 1 s 产物有体积上界，防回归。
 
 ## 跑通占位（验证地基）
 

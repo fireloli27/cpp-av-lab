@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0002 · Opus 是码流，CAF 是盒子</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Opus 是码流，CAF 是盒子</h1>
+      <p class="lede">
+        一课目标：分清「编解码器 / 压缩码流」与「文件容器」，并用码率算 1
+        秒载荷量级——对仗
+        <a href="./0001-pcm-samples-wav-box.html">0001 PCM≠WAV</a>。
+      </p>
+      <div class="meta">
+        <code>/teach</code> 课 · 绑定 Learning「编码」·
+        <a href="../MISSION.md">MISSION.md</a> ·
+        <a href="../../docs/learning/audio/encode.notes.md">课记（契约权威）</a> ·
+        <a href="../reference/opus-caf-cheatsheet.html">速查</a> ·
+        <a href="../../docs/learning/audio/encode.md">短文（怎么跑）</a>
+      </div>
+
+      <h2>知识：编码在管线哪</h2>
+      <p>
+        Glossary「编码」：音频侧把 <strong>PCM 样本</strong>压成<strong>压缩码流</strong>。你仓库里的路径是：
+      </p>
+      <div class="diagram">
+        capture.wav（PCM in WAV）→ AudioConverter（Opus）→ encode.caf（Opus in
+        CAF）
+      </div>
+      <p class="callout">
+        本阶段不采麦、不做 RTP。AEC 通常在采集后、编码前；弱网自适应会动码率——实验固定
+        64&nbsp;kbps，只叙述不实现。细节只维护在课记。
+      </p>
+
+      <h2>知识：两个不同的词（对仗 0001）</h2>
+      <p>
+        <strong>Opus</strong>：<a
+          href="https://www.rfc-editor.org/rfc/rfc6716.html"
+          >RFC 6716</a
+        >
+        定义的<strong>编解码器</strong>。输出是压缩 packet 组成的码流，适合交互语音量级（文档给出约
+        6&nbsp;kbit/s 起的宽范围）。它不是「.caf 文件格式」。
+      </p>
+      <p>
+        <strong>CAF</strong>（Core Audio Format）：Apple 的<strong>容器</strong>——至少有
+        Description + Data；可变包还要 Packet Table 等。见
+        <a
+          href="https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+          >CAF Overview</a
+        >。盒子里可以装 Opus，也可以装别的。
+      </p>
+      <pre>PCM  ≠ WAV
+Opus ≠ CAF</pre>
+      <p>
+        能 <code>afplay encode.caf</code>，说明容器+码流都对；网上传输时，04
+        阶段通常要讨论的是<strong>码流单元</strong>（packet），不一定整文件扔 UDP。
+      </p>
+
+      <h2>知识：码率字节账</h2>
+      <p>
+        采集契约：1 秒裸 PCM ≈ <strong>96 000 B</strong>（课记）。编码目标码率
+        <strong>64 000 bps</strong> → 载荷量级
+        <code>64000 / 8 = 8000</code> B/s。CAF 文件会略大（头、pakt、cookie）；课记与 Catch2
+        用上界防「巨无 free chunk」回归。
+      </p>
+      <p class="callout">
+        实现用系统
+        <code>AudioConverter</code>（不是 libopus C API）把 PCM 拉成 Opus packet 再写入
+        CAF——选型见
+        <a href="../../docs/adr/0002-learning-audio-encode-opus-audioconverter.md"
+          >ADR-0002</a
+        >。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="c"
+          data-ok="对：CAF 是盒子，Opus 是里面的码流。"
+          data-bad="再想：对仗 PCM≠WAV。"
+        >
+          <fieldset>
+            <legend>1. encode.caf 最准确的说法是？</legend>
+            <label
+              ><input type="radio" name="q1" value="a" />
+              又一份 48 kHz 线性 PCM WAV</label
+            >
+            <label
+              ><input type="radio" name="q1" value="b" />
+              裸 Opus 文件名碰巧叫 caf</label
+            >
+            <label
+              ><input type="radio" name="q1" value="c" />
+              CAF 容器里装着 Opus 压缩码流</label
+            >
+            <label
+              ><input type="radio" name="q1" value="d" />
+              RTP 打包后的网络帧文件</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="a"
+          data-ok="对：64000÷8≈8000 B/s 量级。"
+          data-bad="比特÷8 才是字节；别和 PCM 96000 混。"
+        >
+          <fieldset>
+            <legend>
+              2. 固定 64 kbps 时，1 秒压缩载荷大约多少字节（量级）？
+            </legend>
+            <label><input type="radio" name="q2" value="a" /> 约 8 000</label>
+            <label><input type="radio" name="q2" value="b" /> 约 96 000</label>
+            <label><input type="radio" name="q2" value="c" /> 约 48 000</label>
+            <label><input type="radio" name="q2" value="d" /> 约 640 000</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="d"
+          data-ok="对：编码吃 PCM；WAV 只是上游容器。"
+          data-bad="编码阶段压的是样本，不是把 RIFF 头再压一遍当码流。"
+        >
+          <fieldset>
+            <legend>3. 编码阶段真正被压缩的是什么？</legend>
+            <label
+              ><input type="radio" name="q3" value="a" />
+              WAV 文件名字符串本身</label
+            >
+            <label
+              ><input type="radio" name="q3" value="b" />
+              仅 fmt chunk 十六字节</label
+            >
+            <label
+              ><input type="radio" name="q3" value="c" />
+              整个 RIFF 头原样写入 Opus</label
+            >
+            <label
+              ><input type="radio" name="q3" value="d" />
+              契约 PCM 样本（从 WAV data 读出）</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（可选）</h2>
+      <p>
+        跑通短文步骤后执行
+        <code>afinfo out/audio/encode/encode.caf</code>：确认 Data format 含
+        <code>opus</code>，并对比「audio bytes」与整文件大小（头开销）。契约数字仍以课记为准。
+      </p>
+
+      <h2>指定精读</h2>
+      <p>
+        <a href="https://www.rfc-editor.org/rfc/rfc6716.html">RFC 6716</a>
+        — 先读 Abstract + Introduction（§1–2）：盯住「interactive」「bitrate
+        range」，先别跳进附录源码。
+      </p>
+
+      <footer>
+        问老师（对话里的 agent）。书单：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+        · 上节：
+        <a href="./0001-pcm-samples-wav-box.html">0001</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

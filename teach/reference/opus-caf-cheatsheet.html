@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference: Opus / CAF</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Opus / CAF 速查</h1>
+      <p class="lede">
+        压缩表。仓库编码契约以
+        <a href="../../docs/learning/audio/encode.notes.md">课记</a>
+        为准；出处见
+        <a href="../RESOURCES.md">RESOURCES.md</a>。
+      </p>
+
+      <h2>一句话</h2>
+      <ul class="tight">
+        <li>
+          <strong>Opus</strong>：编解码器 → 压缩<strong>码流</strong>（packet 序列）。见
+          <a href="https://www.rfc-editor.org/rfc/rfc6716.html">RFC 6716</a>。
+        </li>
+        <li>
+          <strong>CAF</strong>：Apple 容器 → 装着码流（+ desc / pakt / cookie…）。见
+          <a
+            href="https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html"
+            >CAF Overview</a
+          >。
+        </li>
+      </ul>
+
+      <h2>对仗采集课</h2>
+      <pre>PCM  ≠ WAV（样本布局 ≠ RIFF 盒子）
+Opus ≠ CAF（压缩码流 ≠ Core Audio 盒子）</pre>
+
+      <h2>字节账（量级）</h2>
+      <pre>bitrate 64 kbps = 64_000 bit/s  （压缩输出预算）
+                ÷ 8 = 8_000 B/s 载荷量级
+
+1 s 契约 PCM   ≈ 96_000 B   （48k × 1 × 2，未压缩）
+1 s @ 64 kbps  ≈  8_000 B   码流载荷量级
+encode.caf     = 载荷 + CAF 头（大于纯 Opus 字节属正常）
+
+别混：G.711 电话 PCM 也是 64 kbit/s（8k×8bit），那是未压缩电话率，不是 Opus 目标码率。
+课：<a href="../lessons/0003-what-64-kbps-means.html">0003</a></pre>
+
+      <h2>当前编码契约（镜像课记；改数字先改课记）</h2>
+      <pre>in  = 48_000 Hz · mono · s16le WAV
+out = out/audio/encode/encode.caf  （Opus in CAF）
+bitrate_bps = 64_000（固定）
+API = AudioConverter + AudioFileWritePackets</pre>
+
+      <h2>管线位置</h2>
+      <pre>采集 PCM → [AEC 旁路·本票不做] → 编码 Opus → [打包/RTP·04] → …</pre>
+
+      <h2>相关课</h2>
+      <ul class="tight">
+        <li>
+          <a href="../lessons/0001-pcm-samples-wav-box.html">0001 PCM≠WAV</a>
+        </li>
+        <li>
+          <a href="../lessons/0002-opus-codec-caf-box.html">0002 Opus≠CAF</a>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>

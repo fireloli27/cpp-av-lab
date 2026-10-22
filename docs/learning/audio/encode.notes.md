@@ -52,7 +52,7 @@ out/audio/capture/capture.wav（或 --input）
 
 非契约 WAV（错采样率/声道/位深/非 PCM）直接失败，不做重采样。
 
-Catch2 用合成 1 s 音调 PCM 断言：文件非空、`mFormatID == 'opus'`、48 kHz mono；不读真人 `capture.wav`。
+Catch2 用合成 1 s 音调 PCM 断言：文件非空、`mFormatID == 'opus'`、48 kHz mono，且 `output_bytes` 低于码率包络上界（防 CAF `free` 膨胀回归）；不读真人 `capture.wav`。
 
 ## 关键 API / 决策
 
