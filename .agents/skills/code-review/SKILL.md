@@ -75,6 +75,7 @@ Issue both sub-agent calls together, in the foreground, and aggregate the report
 - The diff command and commit list.
 - The path or fetched contents of the spec.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
+- **Teach sync (when applicable):** if the issue Acceptance / 约定 mentions `teach/` or 教室, tell the Spec sub-agent to `rg` all of `teach/` for the stage number and contradicted protocol names (e.g. RTP). Updating only `MISSION.md` while lessons/reference still contradict counts as **partial**.
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 

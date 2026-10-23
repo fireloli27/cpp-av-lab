@@ -21,7 +21,12 @@ When the ticket is a Learning Pipeline Stage under `.scratch/learning-project/is
 1. Ship the experiment + acceptance **短文** as usual (`docs/learning/{audio|video}/{stage}.md`).
 2. Before commit, write or update the paired **课记** `docs/learning/{audio|video}/{stage}.notes.md` using `docs/learning/_notes_template.md` (all six sections). Link it from the short essay.
 3. Tick the课记 Acceptance item on the issue when present.
+4. If the ticket 约定/Acceptance mentions `teach/` or 教室: before done, `rg` **all** of `teach/` (MISSION, lessons, reference, learning-records) for the stage number and contradicted protocol names; fix every hit, not only `MISSION.md`.
 
 Harness / non-stage tickets skip课记.
+
+## Grilling leftovers
+
+Prefer `/grill-with-docs` to commit ADR / GLOSSARY / issue / spec edits before `/implement`. If those files are still dirty for this ticket when implement starts, fold them into the implement commit (do not leave them orphaned).
 
 Commit your work to the current branch.

@@ -139,3 +139,4 @@ Status: ready-for-agent
 - 2026-10-20: 文档语言钉死——正文中文、术语/路径/命令英文；写入 `AGENTS.md` Doc language 与 `teach/README.md`。
 - 2026-10-22: `/grill-with-docs` on issue 03——音频·编码选定 Opus + `AudioConverter`、CAF 产物与验收边界；未决 #4 再部分收口；见 `issues/03-audio-encode.md` 与 `docs/adr/0002-learning-audio-encode-opus-audioconverter.md`；Glossary「编码」区分 PCM 与压缩码流。
 - 2026-10-22: `/grill-with-docs` on issue 04——音频·本地传输/打包选定长度前缀 Transport Unit + UDP loopback（非产品 RTP 拍板）；未决 #4 再部分收口；未决 #5 产品侧仍开、学习音频实验选型见 ADR-0003；Glossary 增补 Transport Unit；见 `issues/04-audio-local-transport.md`。
+- 2026-10-23: `/retro`（issue 04 会话）——同步全局 `tdd`/`implement`/`code-review` ← 仓库 `.agents/skills`；teach 收官须扫遍 `teach/`；CODING_STANDARDS 补短文成功日志 token↔stdout；grill 收官优先提交再 `/implement`。

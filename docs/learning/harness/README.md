@@ -36,6 +36,8 @@ Learning Project 的文档与实验地基。正式 Client AV SDK / Media Server 
 
 Learning Pipeline Stage 票 `/implement` 收官必写课记（六栏）；harness 占位不要求课记。契约与概念不要在短文/课记/教室三处各写一套：短文引用课记；`teach/lessons` 链课记；速查镜像课记并注明以课记为准。
 
+票面 约定/Acceptance 若提到 `teach/` 或教室须与本阶段选型对齐：收官时扫遍 `teach/`（`MISSION.md`、`lessons/`、`reference/`、`learning-records/`），按阶段号与冲突协议名（如仍写「必须 RTP」）改干净——**不只改 MISSION**。
+
 ## 配置与编译
 
 在仓库根执行：
