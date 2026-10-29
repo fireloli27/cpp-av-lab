@@ -11,6 +11,7 @@ add_subdirectory(harness/placeholder)
 add_subdirectory(audio/capture)
 add_subdirectory(audio/encode)
 add_subdirectory(audio/local-transport)
+add_subdirectory(audio/decode)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

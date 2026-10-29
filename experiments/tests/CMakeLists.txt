@@ -12,11 +12,13 @@ list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/extras")
 add_executable(learning_tests test_placeholder_artifact.cpp
                               test_capture_wav.cpp
                               test_encode_caf.cpp
-                              test_local_transport.cpp)
+                              test_local_transport.cpp
+                              test_decode_wav.cpp)
 target_link_libraries(learning_tests PRIVATE learning_placeholder_lib
                                              learning_audio_capture_lib
                                              learning_audio_encode_lib
                                              learning_audio_local_transport_lib
+                                             learning_audio_decode_lib
                                              Catch2::Catch2WithMain)
 
 include(Catch)
