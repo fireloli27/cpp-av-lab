@@ -72,4 +72,4 @@ Catch2 用 `learning_audio_encode_lib` 从 1 秒合成音调写出 Opus CAF，�
 
 ## 下一课钩子
 
-**06 音频·渲染**默认可吃 `out/audio/decode/decode.wav`（48 kHz mono s16le PCM WAV）。本票不定播放 API。
+**06 音频·渲染**默认吃 `out/audio/decode/decode.wav`（48 kHz mono s16le PCM WAV），用 AudioQueue output 播放，见 [render.notes.md](./render.notes.md)。

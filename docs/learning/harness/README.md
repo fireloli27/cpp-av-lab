@@ -70,6 +70,7 @@ cmake --build experiments/build
 
 - 录麦 / 开摄像头的可执行文件（并已给终端麦克风/摄像头权限）
 - 任意依赖 **AudioConverter** / **AudioFile** 编解码的本机烟测（例如 `learning_audio_encode` + `afplay`）
+- 经扬声器播放的可执行文件（例如 `learning_audio_render`，AudioQueue output 需默认输出设备）
 
 ## 写 Opus CAF（导航）
 
