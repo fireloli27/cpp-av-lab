@@ -9,7 +9,7 @@ Learning Pipeline Stages 的**本地传输/打包**（音频）：把编码侧�
 
 - **上游**：编码产物 `out/audio/encode/encode.caf`（或短文写明的等价 Opus CAF）
 - **本段产出**：UDP loopback 校验通过后的 `out/audio/local-transport/loopback-ok.txt`
-- **下游**：音频「解码」将另开契约（本票**不定** 05 输入格式；可选落盘载荷序列不作为本票硬验收）
+- **下游**：音频「解码」的输入契约由 issue 05 另定（本票当时不定 05 的输入格式；可选落盘载荷序列不作为本票硬验收）
 
 **打包 vs 编码「分包」**：编码课里的 `frames_per_packet` 是编解码器一次吐出的压缩帧大小；本课的 Transport Unit 是「一个 access unit + 长度前缀」的环回发送单元，二者不要混称。
 
@@ -80,4 +80,4 @@ Catch2 用合成 Opus 载荷字节测组包/拆包与 UDP 环回；**不**读真
 
 ## 下一课钩子
 
-**05 音频·解码**将另定输入契约（本票不锁定）。本段只证明：access unit 可按 Transport Unit 在本机收发一致。产品侧若改用 RTP，WebRTC 对照短文再映射；学习环回不必重写成 RTP。
+**05 音频·解码**的硬输入已定为这份 CAF 里的 Opus access unit（按包 `AudioConverter` → PCM WAV；见 issue 05 与 ADR-0004）。本段仍只证明：access unit 可按 Transport Unit 在本机收发一致。产品侧若改用 RTP，WebRTC 对照短文再映射；学习环回不必重写成 RTP。
