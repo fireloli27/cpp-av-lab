@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference: Transport Unit</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Transport Unit 速查</h1>
+      <p class="lede">
+        压缩表。仓库传输契约以
+        <a href="../../docs/learning/audio/local-transport.notes.md">课记</a>
+        为准；出处见
+        <a href="../RESOURCES.md">RESOURCES.md</a>。
+      </p>
+
+      <h2>一句话</h2>
+      <ul class="tight">
+        <li>
+          <strong>access unit</strong>：压缩码流里的一包（本路径 = Opus packet）。
+        </li>
+        <li>
+          <strong>Transport Unit</strong>：access unit + 本票分帧 → 可在环回发送/接收。见
+          <a href="../../GLOSSARY.md">GLOSSARY</a>。
+        </li>
+        <li>
+          <strong>本票分帧</strong>：<code>uint32</code> BE length + 载荷（非 RTP）。见
+          <a href="../../docs/adr/0003-learning-audio-local-transport-length-prefix-udp.md"
+            >ADR-0003</a
+          >。
+        </li>
+      </ul>
+
+      <h2>对仗前几课</h2>
+      <pre>PCM  ≠ WAV
+Opus ≠ CAF
+frames_per_packet ≠ Transport Unit</pre>
+
+      <h2>单元形状（镜像课记；改数字先改课记）</h2>
+      <pre>Transport Unit = [len:4 BE][opus payload…]
+len = payload bytes only（不含这 4 字节）
+无 seq / timestamp / SSRC
+
+环回 = 单进程 POSIX UDP · 127.0.0.1 · bind :0
+产物 = out/audio/local-transport/loopback-ok.txt
+读包 = AudioFileReadPacketData（CAF → Opus 包）</pre>
+
+      <h2>管线位置</h2>
+      <pre>编码 Opus → 本地传输/打包（Transport Unit）→ [jitter·不做] → 解码 → …</pre>
+      <p>
+        学习选型 ≠ 产品必须 RTP。jitter：接收后、解码前（叙述必会）。
+      </p>
+
+      <h2>相关课</h2>
+      <ul class="tight">
+        <li>
+          <a href="../lessons/0004-access-unit-vs-transport-unit.html"
+            >0004 打包≠分包</a
+          >
+        </li>
+        <li>
+          <a href="../lessons/0005-learning-unit-not-product-rtp.html"
+            >0005 学习≠产品 RTP</a
+          >
+        </li>
+        <li>
+          <a href="./opus-caf-cheatsheet.html">Opus / CAF 速查</a>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>

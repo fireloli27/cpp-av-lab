@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0004 · 打包 ≠ 编码分包</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>打包 ≠ 编码「分包」</h1>
+      <p class="lede">
+        一课目标：分清编解码器吐出的 Opus
+        <strong>access unit</strong>，与环回上发送的
+        <strong>Transport Unit</strong>——对仗
+        <a href="./0002-opus-codec-caf-box.html">0002 Opus≠CAF</a>。
+      </p>
+      <div class="meta">
+        <code>/teach</code> 课 · 绑定 Learning「本地传输/打包」·
+        <a href="../MISSION.md">MISSION.md</a> ·
+        <a href="../../docs/learning/audio/local-transport.notes.md"
+          >课记（契约权威）</a
+        >
+        ·
+        <a href="../reference/transport-unit-cheatsheet.html">速查</a> ·
+        <a href="../../docs/learning/audio/local-transport.md">短文（怎么跑）</a>
+      </div>
+
+      <h2>知识：本阶段在管线哪</h2>
+      <p>
+        Glossary「本地传输/打包」：把编码后的数据组织成可在本机环回发送/接收的
+        <strong>Transport Unit</strong>。你仓库里的路径是：
+      </p>
+      <div class="diagram">
+        encode.caf（Opus in CAF）→ 读出 access unit → 打成 Transport Unit → UDP
+        127.0.0.1 环回校验
+      </div>
+      <p class="callout">
+        本阶段不解码、不写 PCM。成功看单元数与载荷字节一致，不是听感。怎么跑见短文；数字只维护在课记。
+      </p>
+
+      <h2>知识：两个容易混的「包」</h2>
+      <p>
+        <strong>编码「分包」</strong>（课记里的
+        <code>frames_per_packet</code>）：编解码器一次吐出多少 PCM
+        帧对应的压缩数据。那是<strong>压缩侧</strong>的节奏，不是「网上怎么切」。
+      </p>
+      <p>
+        <strong>Transport Unit</strong>：把<strong>一个</strong> Opus access
+        unit（压缩载荷字节）再套上本票选定的分帧，变成可在 UDP
+        上自发自收的数据单元。见
+        <a href="../../GLOSSARY.md">GLOSSARY.md</a>。
+      </p>
+      <pre>frames_per_packet  ≠  Transport Unit
+（编码器吐帧节奏）     （环回发送单元）</pre>
+      <p>
+        整份 <code>encode.caf</code> 是<strong>容器文件</strong>，不是一个
+        Transport Unit。环回传的是拆出来的包序列，不是把 CAF 当 blob 扔出去。
+      </p>
+
+      <h2>知识：本票单元长什么样</h2>
+      <p>
+        学习选型（
+        <a href="../../docs/adr/0003-learning-audio-local-transport-length-prefix-udp.md"
+          >ADR-0003</a
+        >
+        ）：
+      </p>
+      <pre>Transport Unit = uint32 大端 length + Opus 载荷
+length = 载荷字节数（不含这 4 字节）
+无 seq / timestamp / SSRC</pre>
+      <p>
+        载荷从 CAF 用
+        <a
+          href="https://developer.apple.com/documentation/audiotoolbox/1512134-audiofilereadpacketdata"
+          >AudioFileReadPacketData</a
+        >
+        读出；环回用
+        <a href="https://www.rfc-editor.org/rfc/rfc768.html">UDP</a>（
+        <code>127.0.0.1</code>，临时端口）。这<strong>不是</strong>产品「必须
+        RTP」的拍板——下一课专门钉这点。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="b"
+          data-ok="对：分包是编码器吐帧；Transport Unit 是环回发送单元。"
+          data-bad="再想：两个『包』不在同一层。"
+        >
+          <fieldset>
+            <legend>1. frames_per_packet 最准确描述什么？</legend>
+            <label
+              ><input type="radio" name="q1" value="a" />
+              UDP 临时端口选定规则</label
+            >
+            <label
+              ><input type="radio" name="q1" value="b" />
+              编解码器一次吐出的帧数</label
+            >
+            <label
+              ><input type="radio" name="q1" value="c" />
+              Transport Unit 的四字节头</label
+            >
+            <label
+              ><input type="radio" name="q1" value="d" />
+              CAF 文件总字节数上限</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="c"
+          data-ok="对：大端 length 只管载荷字节数，不含前缀。"
+          data-bad="length 不含那 4 字节；也不是 RTP 头。"
+        >
+          <fieldset>
+            <legend>2. 本票 Transport Unit 的 length 字段表示？</legend>
+            <label
+              ><input type="radio" name="q2" value="a" />
+              整段 UDP 数据报总长</label
+            >
+            <label
+              ><input type="radio" name="q2" value="b" />
+              RTP 头加上载荷字节</label
+            >
+            <label
+              ><input type="radio" name="q2" value="c" />
+              仅 Opus 载荷的字节数</label
+            >
+            <label
+              ><input type="radio" name="q2" value="d" />
+              CAF 容器头的字节数</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="a"
+          data-ok="对：环回传 access unit 序列，不是整份 CAF。"
+          data-bad="整文件当一包 ≠ 本阶段 Transport Unit。"
+        >
+          <fieldset>
+            <legend>3. 本机环回实际发送的内容是？</legend>
+            <label
+              ><input type="radio" name="q3" value="a" />
+              拆出的 Opus 包加长度前缀</label
+            >
+            <label
+              ><input type="radio" name="q3" value="b" />
+              未拆的 encode.caf 整文件</label
+            >
+            <label
+              ><input type="radio" name="q3" value="c" />
+              采集阶段写出的 PCM WAV</label
+            >
+            <label
+              ><input type="radio" name="q3" value="d" />
+              解码后的线性 PCM 样本流</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（可选）</h2>
+      <p>
+        按短文跑通后看日志：
+        <code>units_sent</code> / <code>units_recv</code> /
+        <code>payload_bytes_sent</code> /
+        <code>payload_bytes_recv</code>。对照课记里
+        <code>loopback-ok.txt</code> 四行字段。契约仍以课记为准。
+      </p>
+
+      <h2>指定精读</h2>
+      <p>
+        <a href="https://www.rfc-editor.org/rfc/rfc768.html">RFC 768</a>
+        — 全文很短：盯住「no connections」「datagram」，先建立「UDP
+        不保证顺序/可靠」的边界感（本课 loopback 几乎碰不到丢包）。
+      </p>
+
+      <footer>
+        问老师（对话里的 agent）。书单：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+        · 上节：
+        <a href="./0003-what-64-kbps-means.html">0003</a>
+        · 下节：
+        <a href="./0005-learning-unit-not-product-rtp.html">0005</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

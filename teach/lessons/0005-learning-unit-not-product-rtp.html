@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0005 · 学习单元 ≠ 产品 RTP</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>学习单元 ≠ 产品必须 RTP</h1>
+      <p class="lede">
+        一课目标：说清 issue 04 的长度前缀 + UDP
+        只是<strong>学习实验选型</strong>；产品「打包是否必须
+        RTP」仍未决——并记住 jitter buffer 在管线的位置一句话。
+      </p>
+      <div class="meta">
+        <code>/teach</code> 课 · 绑定 Learning「本地传输/打包」·
+        <a href="../MISSION.md">MISSION.md</a> ·
+        <a href="../../docs/learning/audio/local-transport.notes.md"
+          >课记（契约权威）</a
+        >
+        ·
+        <a href="../reference/transport-unit-cheatsheet.html">速查</a> ·
+        <a href="../../docs/adr/0003-learning-audio-local-transport-length-prefix-udp.md"
+          >ADR-0003</a
+        >
+      </div>
+
+      <h2>知识：为什么本票故意不用 RTP</h2>
+      <p>
+        Learning spec 把「阶段 3 打包是否 = RTP」列为<strong>未决</strong>（产品侧
+        U10）。issue 04 仍要练「组织成可环回收发的单元」，所以选了更不容易被读成「产品协议已定」的方案：自定义长度前缀 +
+        POSIX UDP loopback（见 ADR-0003）。
+      </p>
+      <p class="callout">
+        能跑通
+        <code>learning_audio_local_transport</code>，证明的是<strong>单元收发一致</strong>，不是「以后 SDK
+        一定不走 RTP」。WebRTC 对照短文再映射真实 RTP。
+      </p>
+
+      <h2>知识：本课环回证明什么 / 不证明什么</h2>
+      <pre>证明：access unit → Transport Unit → 自发自收字节一致
+不证：ICE / TURN / SRTP / 双进程 / 真实丢包抖动
+不证：产品必须（或不许）用 RTP</pre>
+      <p>
+        UDP 本身（
+        <a href="https://www.rfc-editor.org/rfc/rfc768.html">RFC 768</a>
+        ）不保证可靠与顺序；本机 loopback 几乎碰不到这些，所以实验刻意把问题缩到「打包形状
+        + 收发一致」。
+      </p>
+
+      <h2>知识：jitter buffer 放哪（只预告）</h2>
+      <p>
+        叙述必会旁路：抖动缓冲通常在<strong>接收之后、解码之前</strong>，吸收网络抖动。本阶段<strong>不实现、不验收</strong>——课记里留钩子即可。别把它当成五段之一。
+      </p>
+      <div class="diagram">
+        … → 收 Transport Unit → [jitter buffer · 本课不做] → 解码 → 渲染
+      </div>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="d"
+          data-ok="对：学习选型 ≠ 产品 RTP 拍板。"
+          data-bad="ADR-0003 只锁学习实验，未决仍开。"
+        >
+          <fieldset>
+            <legend>1. 跑通 04 环回之后，关于 RTP 正确的是？</legend>
+            <label
+              ><input type="radio" name="q1" value="a" />
+              产品协议已定为必须 RTP</label
+            >
+            <label
+              ><input type="radio" name="q1" value="b" />
+              产品协议已定为禁止 RTP</label
+            >
+            <label
+              ><input type="radio" name="q1" value="c" />
+              学习单元格式等于标准 RTP</label
+            >
+            <label
+              ><input type="radio" name="q1" value="d" />
+              产品是否必须 RTP 仍未决</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="b"
+          data-ok="对：接收后、解码前——只预告位置。"
+          data-bad="不是采集前，也不是五段硬阶段。"
+        >
+          <fieldset>
+            <legend>2. jitter buffer 通常插在哪一带？</legend>
+            <label
+              ><input type="radio" name="q2" value="a" />
+              麦克风采集之前的驱动层</label
+            >
+            <label
+              ><input type="radio" name="q2" value="b" />
+              网络接收之后解码之前</label
+            >
+            <label
+              ><input type="radio" name="q2" value="c" />
+              扬声器硬件完成播放之后</label
+            >
+            <label
+              ><input type="radio" name="q2" value="d" />
+              编码开始之前的 AEC 之后</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="c"
+          data-ok="对：本课硬验收是环回单元一致。"
+          data-bad="听感、ICE、双进程都不在 04 硬范围。"
+        >
+          <fieldset>
+            <legend>3. issue 04 硬验收真正盯的是？</legend>
+            <label
+              ><input type="radio" name="q3" value="a" />
+              环回后听感与采集一致</label
+            >
+            <label
+              ><input type="radio" name="q3" value="b" />
+              ICE 候选收集全部成功</label
+            >
+            <label
+              ><input type="radio" name="q3" value="c" />
+              收发单元数与载荷一致</label
+            >
+            <label
+              ><input type="radio" name="q3" value="d" />
+              双进程跨主机互通成功</label
+            >
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>指定精读</h2>
+      <p>
+        仓库
+        <a href="../../docs/adr/0003-learning-audio-local-transport-length-prefix-udp.md"
+          >ADR-0003</a
+        >
+        — 读完应能复述：<em>为什么</em>选长度前缀，以及它明确<strong>不</strong>收口什么。
+      </p>
+
+      <footer>
+        问老师（对话里的 agent）。书单：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+        · 上节：
+        <a href="./0004-access-unit-vs-transport-unit.html">0004</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>
