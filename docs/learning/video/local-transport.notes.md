@@ -18,11 +18,11 @@ Learning Pipeline Stages 的**本地传输/打包**（视频）：**压缩码流
 | 路径 | 一句话 |
 | --- | --- |
 | `experiments/video/local-transport/main.cpp` | CLI、`--input`、`read_vau`、环回、写 artifact、打印两侧计数 |
-| `experiments/video/local-transport/transport_unit.hpp` | 分片常量 + `split_access_unit` / `reassemble_access_unit` |
+| `experiments/video/local-transport/video_transport_unit.hpp` | 分片常量 + `split_access_unit` / `reassemble_access_unit` |
 | `experiments/video/local-transport/transport_unit.cpp` | 大端 datagram 的拆与合 |
-| `experiments/video/local-transport/udp_loopback.hpp` | `LoopbackStats` + `udp_loopback_roundtrip` |
+| `experiments/video/local-transport/video_udp_loopback.hpp` | `LoopbackStats` + `udp_loopback_roundtrip` |
 | `experiments/video/local-transport/udp_loopback.cpp` | `127.0.0.1` 临时端口，发完一个单元的全部分片再收 |
-| `experiments/video/local-transport/loopback_artifact.hpp` | artifact 路径 |
+| `experiments/video/local-transport/video_loopback_artifact.hpp` | artifact 路径 |
 | `experiments/video/local-transport/loopback_artifact.cpp` | 计数不一致就拒绝写文件 |
 | `experiments/video/local-transport/CMakeLists.txt` | `learning_video_local_transport_lib` + 可执行文件（读 VAU 时链接 encode 库） |
 | `experiments/tests/test_video_local_transport.cpp` | Catch2：乱序重组、UDP 环回、artifact 文本 |
