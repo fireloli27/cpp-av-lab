@@ -74,4 +74,4 @@ Catch2 不创建 `NSWindow`，也不链接 AppKit。真窗口按短文人工看�
 
 ## 下一课钩子
 
-视频五段的拼接与缺口写在 [pipeline.md](./pipeline.md)。AEC、弱网码率自适应、jitter buffer、A/V 同步以及两种信令的边界不在本阶段做实验。
+视频五段的拼接与缺口写在 [pipeline.md](./pipeline.md)。AEC、弱网码率自适应、jitter buffer、A/V 同步以及 Call Signaling / Media Signaling、Client AV SDK / SFU 的边界见 [pipeline-boundaries.md](../pipeline-boundaries.md)，本阶段没有这些实验。
