@@ -3,7 +3,7 @@
 短文（怎么跑、怎么验收）见 [capture.md](./capture.md)。  
 **本文件是本阶段格式契约与代码地图的权威来源**；改分辨率/像素格式/帧数上限先改这里（并同步代码常量），短文与 teach 课只引用。
 
-NV12 平面布局与 PTS vs 帧序号 → [课 0006](../../../teach/lessons/0006-nv12-frame-memory.html) · [课 0007](../../../teach/lessons/0007-pts-vs-frame-index.html) · [速查](../../../teach/reference/video-raw-frame-cheatsheet.html)。
+NV12 平面布局与 PTS vs 帧序号 → [课 0006](../../../teach/lessons/0006-nv12-frame-memory.html) · [课 0007](../../../teach/lessons/0007-pts-vs-frame-index.html) · [课 0008](../../../teach/lessons/0008-capture-stays-cpp-session-is-objc.html)（语言缝） · [速查](../../../teach/reference/video-raw-frame-cheatsheet.html)。
 
 ## 这一课在管线哪
 

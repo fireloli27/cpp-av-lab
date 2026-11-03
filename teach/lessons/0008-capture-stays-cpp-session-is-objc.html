@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0008 · 采集仍是 C++，会话活在 .mm</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>采集仍是 C++，会话活在 .mm</h1>
+      <p class="lede">
+        一课目标：指出这次视频采集里哪一段必须是 Objective-C++，哪一段仍是 C++，以及 delegate 回调为什么只拷贝、不写盘。
+      </p>
+      <div class="meta">
+        视频课 0008 · 承上
+        <a href="./0007-pts-vs-frame-index.html">0007 PTS</a>
+        ·
+        <a href="../../docs/adr/0006-learning-video-capture-avfoundation-nv12.md">ADR-0006</a>
+        ·
+        <a href="../../docs/learning/video/capture.notes.md">课记</a>
+        ·
+        <a href="../reference/capture-language-seam.html">语言缝速查</a>
+      </div>
+
+      <h2>音频能停在 .cpp</h2>
+      <p>
+        音频五段调用的是 AudioToolbox 的 C 接口，例如 <code>AudioQueueNewInput</code>。C 接口可以从 <code>.cpp</code> 直接调用，所以那些实验没有 Objective-C 源文件。
+      </p>
+
+      <h2>这次的会话类型是 Objective-C 类</h2>
+      <p>
+        ADR-0006 选定
+        <a href="https://developer.apple.com/documentation/avfoundation/avcapturesession">AVCaptureSession</a>
+        与
+        <a href="https://developer.apple.com/documentation/avfoundation/avcapturevideodataoutput">AVCaptureVideoDataOutput</a>。
+        Apple 文档里它们是 Objective-C 类：要 <code>alloc</code> / <code>init</code>，要用 delegate，权限请求走 block。没有对等的公开 C 函数。调用它们的文件因此是 <code>main.mm</code>。
+      </p>
+      <p class="callout">
+        <code>.mm</code> 是 Objective-C++，不是把实验改成另一门语言。<code>main.mm</code> 里仍然调用 C++ 的 <code>pack_nv12_planes_to_tight</code> 和 <code>publish_capture_artifacts</code>。
+      </p>
+      <div class="diagram">
+        .cpp  nv12.cpp、test_video_capture.cpp   不创建会话、不打开摄像头
+        .hpp  capture_publish.hpp                两边共用的 C++ 声明
+        .mm   main.mm、capture_publish.mm        只有这里碰 AVFoundation / Core Image
+      </div>
+      <p>
+        Catch2 链的是静态库里的 C++ 写盘契约。测试进程不链接摄像头，所以无摄像头的 <code>check-learning.sh</code> 仍能通过。真机画面只在短文的人工烟测里验收。
+      </p>
+
+      <h2>回调结束之后，才把字节交给写盘</h2>
+      <pre>默认摄像头
+  → AVCaptureVideoDataOutput 的 delegate（serial queue）
+       校验 420v 与 1280×720
+       拷贝 tight NV12 + PTS          ← 仍不写文件
+  → 凑满 --frames，或 15 s 超时
+  → publish_capture_artifacts
+       staging → 替换 out/video/capture/</pre>
+      <p>
+        <a href="https://developer.apple.com/documentation/avfoundation/avcapturevideodataoutput/alwaysdiscardslatevideoframes">alwaysDiscardsLateVideoFrames</a>
+        为 <code>YES</code> 时，delegate queue 来不及取走的帧会被丢掉。在回调里写 1,382,400 字节的文件，或做 PNG 颜色转换，都会把这个 queue 堵住。所以文件 I/O 和 Core Image 预览都在采集结束之后。
+      </p>
+
+      <h2>先钉住 720p，再挂上 delegate</h2>
+      <p>
+        课记记录了本机 FaceTime 摄像头上的现象：只设 <code>AVCaptureSessionPreset1280x720</code> 不够，<code>startRunning</code> 会把 <code>activeFormat</code> 打回 1920×1080。若这时 delegate 已经在收帧，第一张 1080p 会让整次采集失败。
+      </p>
+      <pre>commitConfiguration
+  → startRunning
+  → 再次 lockForConfiguration，钉 1280×720 / 30 fps
+  → 然后才 setSampleBufferDelegate</pre>
+      <p>
+        这是这次实现里用烟测钉下来的顺序，写在课记「踩坑与边界」。格式数字仍以课记契约为准，教室不另写一套。
+      </p>
+
+      <h2>这节不证明的事</h2>
+      <p>
+        保存下来的是 Raw Video Frame 和它的 PTS。编码库还没选。A/V 同步仍在接收/播放一带，本阶段没有把音频时间轴和视频时间轴对齐。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="c"
+          data-ok="对：AVCaptureSession 是 Objective-C 类，调用点放在 .mm。"
+          data-bad="看语言缝：NV12 账本和 Catch2 仍是 C++。"
+        >
+          <fieldset>
+            <legend>1. 采集入口为什么是 main.mm？</legend>
+            <label><input type="radio" name="q1" value="a" /> Catch2 只能编译 Objective-C 源文件</label>
+            <label><input type="radio" name="q1" value="b" /> NV12 字节布局只能写在 .mm 里</label>
+            <label><input type="radio" name="q1" value="c" /> 会话类是 Objective-C 对象</label>
+            <label><input type="radio" name="q1" value="d" /> 本阶段已改成 Swift 工程</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="a"
+          data-ok="对：回调只留下内存里的 tight NV12 与 PTS。"
+          data-bad="写盘、PNG、替换目录都在采集结束之后。"
+        >
+          <fieldset>
+            <legend>2. delegate 回调里这阶段允许做什么？</legend>
+            <label><input type="radio" name="q2" value="a" /> 拷贝 tight NV12 与 PTS</label>
+            <label><input type="radio" name="q2" value="b" /> 把 manifest.csv 写到磁盘</label>
+            <label><input type="radio" name="q2" value="c" /> 用 Core Image 写出 PNG</label>
+            <label><input type="radio" name="q2" value="d" /> 替换 out/video/capture 目录</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="d"
+          data-ok="对：先钉回 720p，再开始收帧，避免吃到 1080p。"
+          data-bad="顺序写在课记：startRunning 之后再钉格式，然后才挂 delegate。"
+        >
+          <fieldset>
+            <legend>3. 本机上 setSampleBufferDelegate 应放在哪一步之后？</legend>
+            <label><input type="radio" name="q3" value="a" /> 请求摄像头权限之前</label>
+            <label><input type="radio" name="q3" value="b" /> 创建 AVCaptureSession 之前</label>
+            <label><input type="radio" name="q3" value="c" /> 第一次设置 preset 的同时</label>
+            <label><input type="radio" name="q3" value="d" /> startRunning 并再次钉 720p 之后</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（两分钟）</h2>
+      <ol class="tight">
+        <li>打开 <code>experiments/video/capture/main.mm</code>，指出哪一次调用仍是 C++ 函数。</li>
+        <li>打开 <code>experiments/tests/test_video_capture.cpp</code>，确认它没有 <code>AVCaptureSession</code>。</li>
+        <li>用自己的话说明：为什么 1080p 的第一帧会让整次采集失败。</li>
+      </ol>
+
+      <h2>指定精读</h2>
+      <p>
+        主源：
+        <a href="https://developer.apple.com/documentation/avfoundation/avcapturesession">Apple：AVCaptureSession</a>。
+        看页面语言是 Objective-C 类，以及 <code>startRunning</code> 启动的是已经 <code>commitConfiguration</code> 的会话。delegate 何时挂上，以课记里这次烟测的顺序为准。
+      </p>
+
+      <footer>
+        有不清楚的词，直接问对话里的 agent；它是这门课的 teacher。上节：
+        <a href="./0007-pts-vs-frame-index.html">0007 PTS</a>
+        · 速查：
+        <a href="../reference/capture-language-seam.html">语言缝</a>
+        · 来源：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

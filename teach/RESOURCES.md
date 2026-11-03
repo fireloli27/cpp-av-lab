@@ -42,6 +42,8 @@
   Apple Core Media API：读取 sample buffer 总时长；不保证等于相邻 PTS 间隔。Use for: PTS / duration 边界。
 - [Apple: CMTime](https://developer.apple.com/documentation/coremedia/cmtime)
   Core Media 的时间值结构。Use for: value / timescale 与纳秒归一化。
+- [Apple: AVCaptureSession](https://developer.apple.com/documentation/avfoundation/avcapturesession)
+  AVFoundation 采集会话，文档接口是 Objective-C 类。Use for: 为何调用点在 `.mm`，以及 `startRunning` 启动的是已提交配置的会话。
 - [Apple: AVCaptureVideoDataOutput](https://developer.apple.com/documentation/avfoundation/avcapturevideodataoutput)
   AVFoundation 视频帧输出。Use for: delegate queue、late frame 丢弃与 callback 边界。
 - SDK: `CoreVideo/CVPixelBuffer.h`（用 `xcrun --sdk macosx --show-sdk-path` 定位）
@@ -62,4 +64,4 @@
 
 - WebRTC 对照短文尚未写（Learning 硬毕业另票）；RTP 深挖等对照课再开。
 - jitter buffer / 弱网自适应动手实验属加分包，本教室只预告位置。
-- A/V 同步的跨 clock 实作与颜色矩阵转换尚未开课；PTS、duration 与 callback queue 已由课 0007 建立边界。
+- A/V 同步的跨 clock 实作与颜色矩阵转换尚未开课；PTS、duration 与 callback queue 已由课 0007 建立边界。语言缝（C++ 契约 / `.mm` 会话）由课 0008 建立，尚未经检索证实。

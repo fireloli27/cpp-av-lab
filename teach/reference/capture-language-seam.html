@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference: Video capture language seam</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>视频采集：语言缝</h1>
+      <p class="lede">
+        压缩表。本次 implement 里谁是 C++、谁是 Objective-C++。格式数字以课记为准。
+      </p>
+
+      <h2>文件各管一段</h2>
+      <table class="timing-table">
+        <thead>
+          <tr><th>路径</th><th>语言</th><th>碰摄像头吗</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>nv12.cpp</code></td><td>C++</td><td>否。tight 字节数与去 stride</td></tr>
+          <tr><td><code>capture_publish.hpp</code></td><td>C++</td><td>否。两边共用的声明</td></tr>
+          <tr><td><code>test_video_capture.cpp</code></td><td>C++</td><td>否。合成帧写盘契约</td></tr>
+          <tr><td><code>main.mm</code></td><td>Objective-C++</td><td>是。会话、权限、delegate</td></tr>
+          <tr><td><code>capture_publish.mm</code></td><td>Objective-C++</td><td>否。写盘与 Core Image PNG</td></tr>
+        </tbody>
+      </table>
+
+      <h2>收帧顺序（本机烟测）</h2>
+      <pre>commitConfiguration
+  → startRunning
+  → 再次钉 activeFormat = 1280×720 / 30 fps
+  → setSampleBufferDelegate
+  → 回调只拷贝 tight NV12 + PTS
+  → 结束后 publish_capture_artifacts</pre>
+      <p>
+        <code>startRunning</code> 在本机 FaceTime 上会把格式打回 1920×1080。delegate 若挂得早，第一张不符尺寸的帧会使整次采集失败。
+      </p>
+
+      <h2>出处</h2>
+      <ul class="tight">
+        <li><a href="https://developer.apple.com/documentation/avfoundation/avcapturesession">Apple：AVCaptureSession</a></li>
+        <li><a href="https://developer.apple.com/documentation/avfoundation/avcapturevideodataoutput">Apple：AVCaptureVideoDataOutput</a></li>
+        <li><a href="../../docs/learning/video/capture.notes.md">课记 capture.notes.md</a></li>
+      </ul>
+
+      <h2>相关课</h2>
+      <ul class="tight">
+        <li><a href="../lessons/0008-capture-stays-cpp-session-is-objc.html">0008 采集仍是 C++，会话活在 .mm</a></li>
+        <li><a href="../lessons/0007-pts-vs-frame-index.html">0007 PTS</a></li>
+        <li><a href="../lessons/0006-nv12-frame-memory.html">0006 NV12</a></li>
+      </ul>
+    </main>
+  </body>
+</html>
