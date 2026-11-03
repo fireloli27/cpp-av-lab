@@ -147,10 +147,12 @@ TEST_CASE("capture directory loader enforces the NV12 contract", "[video][encode
   REQUIRE(loaded[0].nv12.size() == 1382400);
   REQUIRE(loaded[0].nv12[0] == 40);
 
-  std::ofstream manifest(root / "manifest.csv");
-  manifest << "frame_index,file,width,height,pixel_format,pts_ns,relative_pts_ns,"
-              "bytes\n";
-  manifest << "0,frames/frame-000000.nv12,640,480,420v,1000,0,1382400\n";
+  {
+    std::ofstream manifest(root / "manifest.csv");
+    manifest << "frame_index,file,width,height,pixel_format,pts_ns,relative_pts_ns,"
+                "bytes\n";
+    manifest << "0,frames/frame-000000.nv12,640,480,420v,1000,0,1382400\n";
+  }
   REQUIRE_FALSE(enc::load_capture_directory(root, loaded, error));
   REQUIRE(error.find("1280x720") != std::string::npos);
   fs::remove_all(root);
