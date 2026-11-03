@@ -88,4 +88,4 @@ Catch2 用合成字节（含 1201 字节、需要两片的单元）做乱序重�
 
 ## 下一课钩子
 
-**10 视频·解码**默认读 `out/video/encode/encode.vau`（参数集 + access unit），不重跑 UDP。本阶段已经证明载荷可以原样走一圈环回。
+**10 视频·解码**默认读 `out/video/encode/encode.vau`（参数集 + access unit），不重跑 UDP。本阶段已经证明载荷可以原样走一圈环回。见 [decode.notes.md](./decode.notes.md) 与 ADR-0009。
