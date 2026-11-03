@@ -114,7 +114,7 @@ Status: ready-for-agent
 1. Media Signaling 的承载通道（复用 IM / 独立 WebSocket 或 HTTP / 随媒体通道 / 其他）
 2. Media Server（SFU）具体实现路线（自研比例 vs 开源改造选型）
 3. 部署形态（私有化 / 公有云多租户 / 两者）
-4. 五段实验各自的具体库与 API 选型（采集、编码、传输/打包、解码、渲染）——**部分**：音频·采集已选 Core Audio / AudioQueue（issue 02、ADR-0001）；音频·编码已选 AudioToolbox / `AudioConverter` + Opus → CAF（issue 03、ADR-0002）；音频·本地传输/打包已选 AudioToolbox 读包 + 长度前缀 Transport Unit + POSIX UDP loopback（issue 04、ADR-0003）；音频·解码已选 AudioToolbox 读包 + `AudioConverter`（Opus → PCM WAV）（issue 05、ADR-0004）；音频·渲染已选 AudioQueue output（issue 06、ADR-0005）——音频五段已全部选定；视频·采集已选 AVFoundation / `AVCaptureVideoDataOutput` + NV12 `420v`（issue 07、ADR-0006）；视频编码、传输/打包、解码、渲染仍未决
+4. 五段实验各自的具体库与 API 选型（采集、编码、传输/打包、解码、渲染）——**部分**：音频·采集已选 Core Audio / AudioQueue（issue 02、ADR-0001）；音频·编码已选 AudioToolbox / `AudioConverter` + Opus → CAF（issue 03、ADR-0002）；音频·本地传输/打包已选 AudioToolbox 读包 + 长度前缀 Transport Unit + POSIX UDP loopback（issue 04、ADR-0003）；音频·解码已选 AudioToolbox 读包 + `AudioConverter`（Opus → PCM WAV）（issue 05、ADR-0004）；音频·渲染已选 AudioQueue output（issue 06、ADR-0005）——音频五段已全部选定；视频·采集已选 AVFoundation / `AVCaptureVideoDataOutput` + NV12 `420v`（issue 07、ADR-0006）；视频·编码已选 VideoToolbox / `VTCompressionSession` + H.264 Baseline → 学习容器 VAU（issue 08、ADR-0007）；视频传输/打包、解码、渲染仍未决
 5. **阶段 3「打包」的具体含义（产品 / 是否必须 RTP）**：仍未决（U10）。**学习音频实验**已选自定义长度前缀（非 RTP）作为本机环回单元（issue 04、ADR-0003）；该选型**不**视为对本条的产品拍板
 6. ~~音路径与视路径的先后顺序~~ → **已决（issue 07）**：先完成音频五段，再进入视频采集
 7. ~~短文的目录约定与模板细则~~ → **已决（issue 01）**：见 Implementation Decisions「文档与代码布局」
@@ -144,3 +144,4 @@ Status: ready-for-agent
 - 2026-10-29: `/grill-with-docs` on issue 05——音频·解码选定按包 `AudioConverter`（Opus CAF → PCM WAV），不重跑 UDP、不修 priming；未决 #4 再部分收口；Glossary「解码」改为音频侧 PCM 样本；见 `issues/05-audio-decode.md` 与 `docs/adr/0004-learning-audio-decode-audioconverter.md`。
 - 2026-10-29: `/grill-with-docs` on issue 06——音频·渲染选定 AudioQueue output（3×960 帧、`pcm_frames == frames_rendered`、不写产物）；贯通说明 `docs/learning/audio/pipeline.md` 点名离线文件接力等缺口；未决 #4 音频侧收口；Glossary「渲染」磨尖；见 `issues/06-audio-render.md` 与 `docs/adr/0005-learning-audio-render-audioqueue.md`。
 - 2026-10-30: `/grill-with-docs` on issue 07——视频·采集选定 AVFoundation + `AVCaptureVideoDataOutput`、NV12 `420v`、720p/目标 30 fps/默认 30 帧、tight 逐帧文件 + PTS manifest + 首帧 PNG；真实摄像头仍为最终人工验收；未决 #4 的视采集部分收口，见 `issues/07-video-capture.md` 与 `docs/adr/0006-learning-video-capture-avfoundation-nv12.md`。
+- 2026-11-03: issue 08——视频·编码选定 VideoToolbox / `VTCompressionSession`、H.264 Baseline、固定 2 Mbps、学习容器 `encode.vau`（非 MP4、非产品容器拍板）；未决 #4 的视编码部分收口；见 `issues/08-video-encode.md` 与 `docs/adr/0007-learning-video-encode-videotoolbox-h264.md`。
