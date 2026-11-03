@@ -50,12 +50,20 @@ _Avoid_: 正式 SDK, 产品仓, 演示优先的玩具产品
 
 **Learning Pipeline Stages**:
 学习工程硬范围的五个关键阶段（音、视至少各覆盖一条完整路径）：
-1. **采集**：麦克风取到原始 PCM 样本 / 摄像头取到原始帧
+1. **采集**：麦克风取到原始 PCM 样本 / 摄像头取到未压缩的 **Raw Video Frame**
 2. **编码**：音频侧将 **PCM 样本**压成**压缩码流**；视频侧将原始帧压成压缩码流。码流不是 WAV 容器里的 PCM。
 3. **本地传输/打包**：将编码后数据组织成可在本机环回发送/接收的 **Transport Unit**（如 UDP 或文件环回），不要求生产级 ICE/TURN。本阶段的「打包」≠ 编码侧系统「分包」；产品侧「打包是否必须为 RTP」有意未决（学习实验选型不得偷换成产品协议决定）
 4. **解码**：音频侧将压缩码流还原为 **PCM 样本**；视频侧将压缩码流还原为可播放帧。音频解码的输入是码流本身，不是 Transport Unit 的分帧外壳。
 5. **渲染**：音频侧将 **PCM 样本**按输出设备时钟持续交给扬声器，消费节奏由设备回调拉取决定；视频侧将可播放帧显示到画面
 _Avoid_: 把回声消除、弱网自适应、jitter buffer、A/V 同步当成这五段之一；在未决拍板前把「打包」偷换成「必须 RTP」；把 PCM-in-WAV 或未压缩样本称作「码流」；把编码 `frames_per_packet` 与 Transport Unit 混为一谈；把音频解码输出说成与采集不同的另一种「帧」；把调用外部播放器（如 `afplay`）当成渲染实验；把输出缓冲队列称作 jitter buffer
+
+**Raw Video Frame**:
+摄像头采集后、编码前的未压缩视频帧，带有尺寸、像素格式与 Presentation Timestamp。学习路径的视频采集把设备帧规范化为紧排 NV12 420v；它尚不是编码后的视频码流。
+_Avoid_: 视频码流, 压缩帧, 不指明格式与平面排列的「像素缓冲」
+
+**Presentation Timestamp (PTS)**:
+媒体样本在来源时间轴上的呈现时刻，不是样本序号，也不是 duration。视频采集 manifest 以整数纳秒记录原始 PTS，并另记相对首帧的 PTS。
+_Avoid_: wall-clock reception time, frame index, 把采样时刻与展示时刻混为一谈
 
 **Transport Unit**:
 Learning Pipeline Stages「本地传输/打包」中，把压缩码流组织成的可在环回上发送/接收的数据单元。音频学习路径以码流 access unit（如 Opus 包）为单元内容，再加本票选定的分帧；不等于「整份容器文件当一包」，也不自动等于 RTP 包。

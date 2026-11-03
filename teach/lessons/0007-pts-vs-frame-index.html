@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0007 · 第 3 帧不一定是第 100 ms</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>第 3 帧不一定是第 100 ms</h1>
+      <p class="lede">
+        一课目标：分清 frame index、Presentation Timestamp（PTS）、duration 与 callback 到达时刻，并能从相邻 PTS 判断是否发生了时间空洞。
+      </p>
+      <div class="meta">
+        视频课 0007 · 承上
+        <a href="./0006-nv12-frame-memory.html">0006 NV12 字节账</a>
+        ·
+        <a href="../../docs/adr/0006-learning-video-capture-avfoundation-nv12.md">ADR-0006</a>
+        ·
+        <a href="../../.scratch/learning-project/issues/07-video-capture.md">issue 07</a>
+        ·
+        <a href="../reference/video-timing-cheatsheet.html">时序速查</a>
+      </div>
+
+      <h2>先取回上一课的锚</h2>
+      <p>
+        NV12 的 tight 帧字节账是后续时序表的「每帧载荷量」。1280×720、8-bit 4:2:0 时，Y plane 是 921,600 bytes，UV plane 是 460,800 bytes。
+      </p>
+
+      <h2>四个时刻不要混成一件事</h2>
+      <table class="timing-table">
+        <thead>
+          <tr><th>名字</th><th>回答的问题</th><th>本仓库例子</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>frame_index</td><td>本次成功收到第几帧</td><td>0, 1, 2, 3…</td></tr>
+          <tr><td>source PTS</td><td>这张画面属于来源时间轴哪一刻</td><td>manifest 的 pts_ns</td></tr>
+          <tr><td>duration</td><td>这个 media sample 覆盖多长时间</td><td>可以 unknown / invalid</td></tr>
+          <tr><td>callback arrival</td><td>进程何时轮到执行回调</td><td>不作为媒体时间</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Apple 的
+        <a href="https://developer.apple.com/documentation/coremedia/cmsamplebuffergetpresentationtimestamp(_:_:)">CMSampleBufferGetPresentationTimeStamp</a>
+        返回 sample buffer 中最早的 presentation timestamp；失败时返回 <code>kCMTimeInvalid</code>。本采集路径每个视频 buffer 一张帧，因此它就是我们写入 manifest 的来源 PTS。
+      </p>
+      <p class="callout">
+        <strong>PTS 不是 callback 的执行时刻。</strong>操作系统可能在 PTS=100 ms 的画面之后，晚几毫秒才让 delegate queue 执行它；排队延迟改变「何时处理」，不改变这张画面在媒体时间轴上的坐标。
+      </p>
+
+      <h2>CMTime 怎样变成整数纳秒</h2>
+      <pre>CMSampleBuffer
+  → CMSampleBufferGetPresentationTimeStamp()
+  → CMTime(value, timescale)
+
+seconds = value / timescale
+pts_ns  = round(seconds × 1_000_000_000)
+
+例如：CMTime(1, 30)
+     = 0.033333… s
+     ≈ 33,333,333 ns</pre>
+      <p>
+        实现时应转成 <code>int64_t</code> 纳秒并检查 <code>CMTIME_IS_VALID</code>。Issue 07 的 manifest 同时记录 <code>pts_ns</code> 与
+        <code>relative_pts_ns</code>，后者等于 <code>pts_ns - first_pts_ns</code>，所以首帧固定为 0。
+      </p>
+
+      <h2>交互：从时间差找空洞</h2>
+      <section class="lab" data-pts-timeline>
+        <h3>PTS timeline lab</h3>
+        <p class="lab-intro">
+          先看稳定 30 fps，再切到「第 3 帧前丢了一帧」。观察 frame_index 仍连续，但 PTS 的相邻差值变大。
+        </p>
+        <div class="scenario-buttons">
+          <button type="button" data-timeline-scenario="steady" aria-pressed="true">stable</button>
+          <button type="button" data-timeline-scenario="dropped" aria-pressed="false">dropped</button>
+          <button type="button" data-timeline-scenario="jitter" aria-pressed="false">jitter</button>
+        </div>
+        <div class="timeline-track" data-timeline-track aria-label="PTS 时间线"></div>
+        <div class="timeline-axis"><span>0 ms</span><span>33 ms</span><span>67 ms</span><span>100 ms</span><span>133 ms</span></div>
+        <table class="timing-table">
+          <thead>
+            <tr><th>frame_index</th><th>pts_ns</th><th>relative_pts_ns</th><th>Δ previous</th></tr>
+          </thead>
+          <tbody data-timeline-rows></tbody>
+        </table>
+        <p class="lab-note" data-timeline-summary aria-live="polite"></p>
+      </section>
+      <p>
+        在 dropped 场景里，<code>frame_index=3</code> 的 PTS 约为 133 ms，而前一帧约为 67 ms，差值是 66.7 ms。帧序号只说「这是我收到的第四帧」；它无法回答「本来 100 ms 附近是不是少了一张」。
+      </p>
+
+      <h2>duration 为什么不能乱补</h2>
+      <p>
+        <a href="https://developer.apple.com/documentation/coremedia/cmsamplebuffergetduration(_:)">CMSampleBufferGetDuration</a>
+        返回 sample buffer 的 duration，但 duration 可能 invalid / unknown。即使只知道目标 30 fps，也不能在下游把每次 frame_index 增量都伪装成精确 33.3 ms；真实 PTS 才能暴露丢帧与不均匀间隔。
+      </p>
+
+      <h2>为什么 callback 里不要写 1.38 MB 文件</h2>
+      <p>
+        <code>AVCaptureVideoDataOutput</code> 的 delegate 在指定 queue 上回调。queue 被文件 I/O 或颜色转换堵住时，late video frames 可能被丢弃。Apple SDK 的
+        <code>AVCaptureVideoDataOutput.h</code> 对 <code>alwaysDiscardsLateVideoFrames</code> 的说明就是这个边界；issue 07 因此要求 callback 只复制 tight NV12 与 PTS，写盘放到采集结束后。
+      </p>
+      <div class="diagram">
+        摄像头帧时间轴：PTS 0 → 33 → 67 → [100 丢失] → 133 ms
+        callback queue：  可以晚处理，但不能把 PTS 改写成自己的执行时刻
+      </div>
+
+      <h2>A/V 同步只点名</h2>
+      <p>
+        A/V 同步要把音频和视频放到可比较的呈现时间轴上；它通常发生在接收、jitter buffer 与播放调度一带。07 的单视频采集只保留 PTS，不证明独立录制的 audio 与 video 已同步。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="b"
+          data-ok="对：921600 + 460800 = 1382400 bytes。"
+          data-bad="回到 0006：NV12 是 1 Y byte + 0.5 UV byte / pixel。"
+        >
+          <fieldset>
+            <legend>1. 热身题：tight 1280×720 NV12 一帧多少字节？</legend>
+            <label><input type="radio" name="q1" value="a" /> 921,600 bytes</label>
+            <label><input type="radio" name="q1" value="b" /> 1,382,400 bytes</label>
+            <label><input type="radio" name="q1" value="c" /> 1,843,200 bytes</label>
+            <label><input type="radio" name="q1" value="d" /> 2,764,800 bytes</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="a"
+          data-ok="对：PTS 是来源时间轴上的呈现坐标。"
+          data-bad="callback 到达时刻属于软件调度，不是媒体呈现时间。"
+        >
+          <fieldset>
+            <legend>2. CMSampleBuffer 的 PTS 最准确回答哪个问题？</legend>
+            <label><input type="radio" name="q2" value="a" /> 画面应在来源时间轴何时呈现</label>
+            <label><input type="radio" name="q2" value="b" /> 回调线程在何时真正取得 CPU</label>
+            <label><input type="radio" name="q2" value="c" /> 本次运行中收到的是第几帧</label>
+            <label><input type="radio" name="q2" value="d" /> 文件在磁盘上总共占用多少字节</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="d"
+          data-ok="对：相邻 PTS 差约 66.7 ms，暴露约 100 ms 处的空洞。"
+          data-bad="看 Δ previous，不要只看 frame_index 是否连续。"
+        >
+          <fieldset>
+            <legend>3. dropped 场景里 frame_index=3 的 PTS 是 133 ms，前一帧是 67 ms，说明什么？</legend>
+            <label><input type="radio" name="q3" value="a" /> 帧文件大小突然增加到了两倍</label>
+            <label><input type="radio" name="q3" value="b" /> FPS 已经永久改成了十五帧每秒</label>
+            <label><input type="radio" name="q3" value="c" /> callback 执行时刻已经变成 133 ms</label>
+            <label><input type="radio" name="q3" value="d" /> 两帧之间约有一个 33 ms 时间空洞</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（两分钟）</h2>
+      <ol class="tight">
+        <li>打开 dropped 场景，自己从表里写出 <code>pts_ns</code>、<code>relative_pts_ns</code>、Δ previous。</li>
+        <li>切到 jitter 场景，判断它是否一定等于「丢了一帧」。</li>
+        <li>用自己的话解释：为什么 callback 延迟不要求改写 PTS。</li>
+      </ol>
+      <p class="callout">
+        判断标准：看到「frame_index 连续」不能直接说「没有丢帧」；必须比较 PTS。看到「PTS 间隔变大」也要区分 scheduler jitter 与实际缺席，不能只凭一个差值断言。
+      </p>
+
+      <h2>指定精读</h2>
+      <p>
+        主源：
+        <a href="https://developer.apple.com/documentation/coremedia/cmsamplebuffergetpresentationtimestamp(_:_:)">Apple：CMSampleBufferGetPresentationTimeStamp</a>。
+        盯住 Return Value 与 Discussion：它取 sample buffer 中数值最早的 presentation timestamp，且错误时返回 <code>kCMTimeInvalid</code>。
+      </p>
+
+      <footer>
+        有不清楚的词，直接问对话里的 agent；它是这门课的 teacher。上节：
+        <a href="./0006-nv12-frame-memory.html">0006 NV12</a>
+        · 速查：
+        <a href="../reference/video-timing-cheatsheet.html">PTS / timing</a>
+        · 来源：
+        <a href="../RESOURCES.md">RESOURCES.md</a>
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+    <script src="../assets/pts-timeline.js"></script>
+  </body>
+</html>

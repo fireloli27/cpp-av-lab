@@ -179,3 +179,222 @@ footer a {
 ul.tight li {
   margin: 0.25rem 0;
 }
+
+
+/* Video plane explorer */
+.lab {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  padding: 1.15rem;
+  margin: 1.35rem 0;
+}
+
+.lab h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.lab-intro {
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.lab-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem 0.8rem;
+}
+
+.lab-controls label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.lab-controls input {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.42rem 0.5rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  font: 0.92rem var(--mono);
+}
+
+.presets {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.8rem 0 1rem;
+}
+
+.presets button {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.32rem 0.55rem;
+  font: 0.82rem var(--mono);
+  cursor: pointer;
+}
+
+.plane-stack {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1rem 0;
+}
+
+.plane {
+  min-height: 54px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.plane strong {
+  font-family: var(--mono);
+  font-weight: 500;
+  text-align: right;
+}
+
+.plane-y {
+  background: repeating-linear-gradient(135deg, #f4efe3, #f4efe3 10px, #eee5d3 10px, #eee5d3 20px);
+}
+
+.plane-uv {
+  background: repeating-linear-gradient(90deg, #dfe9f7, #dfe9f7 10px, #d5e4f8 10px, #d5e4f8 20px);
+}
+
+.lab-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.stat {
+  border-top: 2px solid var(--ink);
+  padding-top: 0.45rem;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 0.15rem;
+  font: 0.9rem var(--mono);
+}
+
+.lab-note {
+  min-height: 1.5em;
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 560px) {
+  .lab-results {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .presets { display: none; }
+  .lab { break-inside: avoid; }
+}
+
+
+/* Video timing timeline */
+.timeline-track {
+  position: relative;
+  height: 76px;
+  margin: 1.2rem 0 0.45rem;
+  border-bottom: 1px solid var(--rule);
+  background:
+    linear-gradient(to right, rgba(26, 26, 26, 0.06) 1px, transparent 1px) 0 0 / 20% 100%;
+}
+
+.timeline-dot {
+  position: absolute;
+  bottom: 0.7rem;
+  width: 2.3rem;
+  transform: translateX(-50%);
+  text-align: center;
+  font: 0.72rem var(--mono);
+}
+
+.timeline-dot::before {
+  content: "";
+  display: block;
+  width: 0.72rem;
+  height: 0.72rem;
+  margin: 0 auto 1.55rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(11, 95, 255, 0.12);
+}
+
+.timeline-axis {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font: 0.72rem var(--mono);
+}
+
+.timing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.8rem;
+}
+
+.timing-table th,
+.timing-table td {
+  padding: 0.38rem 0.35rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: right;
+  font-family: var(--mono);
+}
+
+.timing-table th:first-child,
+.timing-table td:first-child {
+  text-align: left;
+}
+
+.timing-table tr.is-gap td {
+  background: #fff2d8;
+  color: #7a4b00;
+}
+
+.scenario-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+}
+
+.scenario-buttons button {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.35rem 0.55rem;
+  font: 0.82rem var(--mono);
+  cursor: pointer;
+}
+
+.scenario-buttons button[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+}
+
+@media print {
+  .scenario-buttons { display: none; }
+}

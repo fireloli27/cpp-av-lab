@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0006 · NV12：一帧视频怎样装进内存</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>NV12：一帧视频怎样装进内存</h1>
+      <p class="lede">
+        一课目标：给定 width 与 height，算出一帧 8-bit NV12 的 Y、UV 与总字节数，并解释为什么不能把 row stride 当成可见宽度。
+      </p>
+      <div class="meta">
+        视频课 0006 · 为 Learning「视频·采集」做前置 ·
+        <a href="../../.scratch/learning-project/issues/07-video-capture.md">issue 07</a>
+        ·
+        <a href="../../docs/adr/0006-learning-video-capture-avfoundation-nv12.md">ADR-0006</a>
+        ·
+        <a href="../reference/video-raw-frame-cheatsheet.html">速查</a>
+        ·
+        <a href="./0001-pcm-samples-wav-box.html">对仗 0001 PCM≠WAV</a>
+      </div>
+
+      <h2>先建立一个画面直觉</h2>
+      <p>
+        摄像头送来的是未压缩的 <strong>Raw Video Frame</strong>：每个位置有亮度样本，还有一组共享的颜色偏差样本。它不是 JPEG / H.264，也还没有经过「编码」这一站。
+      </p>
+      <p>
+        NV12 是 8-bit 4:2:0 的两 plane 布局。先看形状，暂不看颜色转换：
+      </p>
+      <pre>Y plane       width × height 个 Y
+              Y00  Y01  Y02  Y03 …
+              Y10  Y11  Y12  Y13 …
+
+UV plane      (width/2) × (height/2) 个 UV pair
+              U00  V00  U01  V01 …
+              U10  V10  U11  V11 …</pre>
+      <p>
+        <strong>4:2:0</strong> 表示 chroma 横向减半、纵向也减半：一个 U/V pair 服务原图中的 2×2 四块 luma。
+        <a href="https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering#yuv-sampling">Microsoft 的 YUV 采样说明</a>
+        把这一点写得很直接；NV12 的 Y 在前、交错 U/V 在后的布局见
+        <a href="https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering#nv12">NV12 一节</a>。
+      </p>
+
+      <h2>字节账：12 bits / pixel 从哪里来</h2>
+      <div class="diagram">
+        Y  = width × height × 1 byte
+        UV = (width/2) × (height/2) × 2 bytes
+        总 = width × height × 1.5 bytes
+      </div>
+      <p>
+        这里的 <code>×1.5</code> 只对 <strong>8-bit 4:2:0</strong> 成立。它不是「所有视频」的常数，也不是压缩率。Apple
+        <code>420v</code> 对本仓库还多一层含义：8-bit <strong>video range</strong>。Apple SDK 的
+        <code>CVPixelBuffer.h</code> 写明 Y 名义范围是 16–235、Cb/Cr 是 16–240；这与 RGB 的 0–255 不同，预览时必须按正确颜色语义转换。
+      </p>
+
+      <h2>亲手算：改 width、height 或 stride</h2>
+      <section class="lab" data-nv12-lab>
+        <h3>NV12 frame lab</h3>
+        <p class="lab-intro">
+          先点 720p 预设。再把 Y stride 改成 1408、UV stride 改成 1408，观察「tight frame」与「allocated」为何不同。
+        </p>
+        <div class="lab-controls">
+          <label>width<input data-nv12-width type="number" min="2" max="7680" step="2" value="1280" /></label>
+          <label>height<input data-nv12-height type="number" min="2" max="4320" step="2" value="720" /></label>
+          <label>Y row stride / bytes<input data-nv12-y-stride type="number" min="2" value="1280" /></label>
+          <label>UV row stride / bytes<input data-nv12-uv-stride type="number" min="2" value="1280" /></label>
+        </div>
+        <div class="presets" aria-label="尺寸预设">
+          <button type="button" data-nv12-preset data-width="1280" data-height="720" data-y-stride="1280" data-uv-stride="1280">720p tight</button>
+          <button type="button" data-nv12-preset data-width="1280" data-height="720" data-y-stride="1408" data-uv-stride="1408">720p padded</button>
+          <button type="button" data-nv12-preset data-width="640" data-height="480" data-y-stride="640" data-uv-stride="640">480p tight</button>
+        </div>
+        <div class="plane-stack" aria-label="NV12 plane 尺寸">
+          <div class="plane plane-y">
+            <span>Y plane · <span data-nv12-shape>1280 × 720</span></span>
+            <strong data-nv12-y-bytes>921,600 B</strong>
+          </div>
+          <div class="plane plane-uv">
+            <span>UV plane · <span data-nv12-uv-shape>640 × 360 UV pairs</span></span>
+            <strong data-nv12-uv-bytes>460,800 B</strong>
+          </div>
+        </div>
+        <div class="lab-results">
+          <div class="stat"><span>tight frame</span><strong data-nv12-frame-bytes>1,382,400 B</strong></div>
+          <div class="stat"><span>allocated with stride</span><strong data-nv12-allocated>1,382,400 B</strong></div>
+          <div class="stat"><span>row padding</span><strong data-nv12-padding>0 B</strong></div>
+        </div>
+        <p class="lab-note" data-nv12-note aria-live="polite"></p>
+      </section>
+
+      <h2>最容易踩的坑：stride 不是 width</h2>
+      <p>
+        <code>CVPixelBufferGetBytesPerRowOfPlane</code> 返回的是「分配器实际每行跨多少字节」。它可能大于可见宽度，因为硬件 / 对齐会在每行尾部留 padding。
+        <a href="https://developer.apple.com/documentation/corevideo/cvpixelbuffergetbytesperrowofplane(_:_:)">Apple 文档</a>
+        和
+        <a href="https://developer.apple.com/documentation/corevideo/cvpixelbuffergetbaseaddressofplane(_:_:)">plane base address</a>
+        要成对使用。
+      </p>
+      <pre>正确：plane0 每行只复制 width bytes
+      plane1 每行只复制 (width/2) × 2 bytes
+
+错误：把 base address 后面的一大段连续内存
+      直接 memcpy 成 width × height</pre>
+      <p>
+        Issue 07 要写 <strong>tight-packed</strong> 文件，所以复制时必须按可见宽度逐行读，跳过每行末尾的 padding。你可用本页 lab 的「720p padded」预设看到差额：每帧分配区会比 tight 帧多出若干字节；那些字节不属于画面。
+      </p>
+
+      <h2>技能：检索练习</h2>
+      <div class="quiz" data-quiz>
+        <h3>测验</h3>
+        <form
+          data-correct="a"
+          data-ok="对：横向和纵向都减半，所以每行有 width/2 个 UV pair。"
+          data-bad="再想 4:2:0：两个方向都以 2:1 子采样。"
+        >
+          <fieldset>
+            <legend>1. NV12 的 UV plane 每行有多少个 UV pair？</legend>
+            <label><input type="radio" name="q1" value="a" /> 每行 width/2 个 UV pair</label>
+            <label><input type="radio" name="q1" value="b" /> 每行 width×1 个 UV pair</label>
+            <label><input type="radio" name="q1" value="c" /> 每行 height/2 个 UV pair</label>
+            <label><input type="radio" name="q1" value="d" /> 每行 width×height/2 个 UV pair</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="b"
+          data-ok="对：921600 + 460800 = 1382400 bytes。"
+          data-bad="再算：Y + 半个宽高的 UV pair，每个 pair 两字节。"
+        >
+          <fieldset>
+            <legend>2. tight 1280×720 8-bit NV12 一帧多少字节？</legend>
+            <label><input type="radio" name="q2" value="a" /> 921,600 bytes</label>
+            <label><input type="radio" name="q2" value="b" /> 1,382,400 bytes</label>
+            <label><input type="radio" name="q2" value="c" /> 1,843,200 bytes</label>
+            <label><input type="radio" name="q2" value="d" /> 3,686,400 bytes</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <form
+          data-correct="d"
+          data-ok="对：stride 提供起点，width 决定每行真正复制多少可见字节。"
+          data-bad="padding 是行尾空位，不属于可见画面。"
+        >
+          <fieldset>
+            <legend>3. 从 padded CVPixelBuffer 写 tight 文件应怎么复制？</legend>
+            <label><input type="radio" name="q3" value="a" /> 整段按 height×width 一次复制完成</label>
+            <label><input type="radio" name="q3" value="b" /> 整段按 stride×height 一次复制完成</label>
+            <label><input type="radio" name="q3" value="c" /> 按 height 逐列跳过所有 plane 头</label>
+            <label><input type="radio" name="q3" value="d" /> 按 width/UV 行宽逐行复制可见字节</label>
+          </fieldset>
+          <button type="submit">对本题</button>
+          <div class="feedback" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <h2>动手（两分钟）</h2>
+      <ol class="tight">
+        <li>在 lab 里先记下 720p tight 的 <code>1,382,400 B</code>。</li>
+        <li>切成 720p padded，记下 allocated 与 row padding 的差额。</li>
+        <li>把 width 改成 640、height 改成 480，先心算再让 lab 给答案。</li>
+      </ol>
+      <p class="callout">
+        下一课再讲 PTS（帧应在何时呈现）和 AVFoundation callback。那一课会回答：同样是 30 帧，为什么帧序号不能替代时间戳。
+      </p>
+
+      <h2>指定精读</h2>
+      <p>
+        主源：
+        <a href="https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering#nv12">Microsoft：Recommended 8-Bit YUV Formats — NV12</a>。
+        先读 YUV Sampling、Stride、NV12 三处。再对照
+        <a href="https://developer.apple.com/documentation/corevideo/cvpixelbuffergetbytesperrowofplane(_:_:)">Apple 的 bytesPerRowOfPlane</a>，把「可见宽度」与「分配行宽」分开。
+      </p>
+
+      <footer>
+        有不清楚的词，直接问对话里的 agent；它是这门课的 teacher。完整来源见
+        <a href="../RESOURCES.md">RESOURCES.md</a>，压缩表见
+        <a href="../reference/video-raw-frame-cheatsheet.html">Raw Video Frame 速查</a>。
+      </footer>
+    </main>
+    <script src="../assets/quiz.js"></script>
+    <script src="../assets/nv12-explorer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference: Raw Video Frame / NV12</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Raw Video Frame / NV12 速查</h1>
+      <p class="lede">
+        压缩表。面向 Learning「视频·采集」；术语先服从
+        <a href="../../GLOSSARY.md">GLOSSARY.md</a>，本阶段落地契约见 issue 07 / ADR-0006。
+      </p>
+
+      <h2>一句话</h2>
+      <ul class="tight">
+        <li><strong>Frame</strong>：某一时刻的二维画面；编码前仍是未压缩样本。</li>
+        <li><strong>Pixel</strong>：画面中的一个位置；它的字节数由 pixel format 决定。</li>
+        <li><strong>NV12</strong>：8-bit 4:2:0，两 plane；Y 在前，交错 Cb/Cr 在后。</li>
+        <li><strong>420v</strong>：Apple 的 NV12 video-range 格式，本仓库采集固定用它。</li>
+      </ul>
+
+      <h2>NV12 几何</h2>
+      <pre>width W · height H
+
+Y plane     W × H 个 1-byte samples
+UV plane    (W/2) × (H/2) 个 pairs
+            每个 pair = [Cb, Cr] = 2 bytes
+
+tight bytes = W×H + (W/2)(H/2)×2
+            = W×H×1.5</pre>
+      <p>
+        <code>×1.5</code> 只适用于 8-bit 4:2:0。一个 UV pair 对应 2×2 个 Y 位置，所以 chroma 横纵都按 2:1 子采样。
+      </p>
+
+      <h2>1280×720 字节账</h2>
+      <pre>Y      = 1280 × 720       =   921,600 B
+UV     = 640 × 360 × 2    =   460,800 B
+------------------------------------------
+frame  =                    1,382,400 B
+30 帧  =                   41,472,000 B ≈ 39.6 MiB</pre>
+
+      <h2>stride / pitch</h2>
+      <pre>visible row bytes ≠ allocated row bytes
+
+Y row:  width
+UV row: width/2 × 2 = width
+
+真实 buffer：
+rowBytes = CVPixelBufferGetBytesPerRowOfPlane(pb, plane)
+rowBytes 可能大于 visible row bytes
+
+tight 文件：
+逐行复制 visible row bytes，跳过 row padding</pre>
+      <p class="callout">
+        Apple 文档把 <code>CVPixelBufferGetBaseAddressOfPlane</code> 与
+        <code>CVPixelBufferGetBytesPerRowOfPlane</code> 分开提供，正是因为「起点」和「行跨度」是两件事。
+      </p>
+
+      <h2>video range</h2>
+      <pre>Apple 420v，8-bit：
+Y nominal 16…235
+Cb/Cr nominal 16…240
+
+不等于 RGB 的 0…255。
+预览转换需要正确颜色矩阵与 range。</pre>
+
+      <h2>管线和边界</h2>
+      <pre>摄像头
+  → Raw Video Frame（AVFoundation / CVPixelBuffer，420v）
+  → [编码：本速查未讲]
+  → compressed bitstream
+  → …</pre>
+      <ul class="tight">
+        <li>PNG 预览是缩略派生证据，不取代原始 NV12。</li>
+        <li>PTS 回答「何时呈现」；帧序号只回答「第几张」。</li>
+        <li>packet、RTP、jitter buffer 都不是采集 stage 的帧字节布局。</li>
+      </ul>
+
+      <h2>出处</h2>
+      <ul class="tight">
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering#nv12">Microsoft：8-Bit YUV Formats</a>
+          — 4:2:0、stride、NV12 内存布局。
+        </li>
+        <li>
+          <a href="https://developer.apple.com/documentation/corevideo/cvpixelbuffergetbytesperrowofpane(_:_:)">Apple：CVPixelBufferGetBytesPerRowOfPlane</a>
+          — plane 的分配行宽。
+        </li>
+        <li>
+          <a href="https://developer.apple.com/documentation/corevideo/cvpixelbuffergetbaseaddressofplane(_:_:)">Apple：CVPixelBufferGetBaseAddressOfPlane</a>
+          — plane 起点。
+        </li>
+        <li>
+          Apple SDK <code>CoreVideo/CVPixelBuffer.h</code> — <code>420v</code> / video-range 常量定义。
+        </li>
+      </ul>
+
+      <h2>相关课</h2>
+      <ul class="tight">
+        <li><a href="../lessons/0006-nv12-frame-memory.html">0006 NV12 一帧怎样装进内存</a></li>
+        <li><a href="../lessons/0001-pcm-samples-wav-box.html">0001 PCM≠WAV</a></li>
+      </ul>
+
+      <footer>
+        <a href="../RESOURCES.md">完整来源</a>
+        · <a href="../../docs/adr/0006-learning-video-capture-avfoundation-nv12.md">ADR-0006</a>
+        · <a href="../../.scratch/learning-project/issues/07-video-capture.md">issue 07</a>
+      </footer>
+    </main>
+  </body>
+</html>

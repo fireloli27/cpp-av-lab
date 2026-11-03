@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference: Video PTS / Timing</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>视频 PTS / Timing 速查</h1>
+      <p class="lede">
+        压缩表。用于区分 frame index、PTS、duration 与 callback arrival；仓库契约以 issue 07 / ADR-0006 为准。
+      </p>
+
+      <h2>四个时间概念</h2>
+      <table class="timing-table">
+        <thead><tr><th>概念</th><th>含义</th><th>不能替代</th></tr></thead>
+        <tbody>
+          <tr><td>frame_index</td><td>本次成功收到帧的顺序号</td><td>PTS</td></tr>
+          <tr><td>PTS</td><td>来源时间轴上的呈现时刻</td><td>callback arrival</td></tr>
+          <tr><td>duration</td><td>sample 覆盖的时长；可能 invalid</td><td>下一帧 PTS</td></tr>
+          <tr><td>arrival</td><td>线程实际处理 callback 的时刻</td><td>媒体时间</td></tr>
+        </tbody>
+      </table>
+
+      <h2>CMSampleBuffer → pts_ns</h2>
+      <pre>CMTime presentation = CMSampleBufferGetPresentationTimeStamp(sample);
+
+if (!CMTIME_IS_VALID(presentation)) {
+  // manifest 契约要求 PTS；此处应失败
+}
+
+int64_t pts_ns =
+    round(presentation.value * 1e9 / presentation.timescale);
+
+int64_t relative_pts_ns = pts_ns - first_pts_ns;</pre>
+      <p>
+        <code>CMTime</code> 的单位由 timescale 决定。通常调用 <code>CMTimeConvertScale</code> 再转整数，并明确 rounding rule；不要无检查地做浮点算术。
+      </p>
+
+      <h2>Issue 07 manifest</h2>
+      <pre>frame_index,file,width,height,pixel_format,pts_ns,relative_pts_ns,bytes</pre>
+      <ul class="tight">
+        <li><code>pts_ns</code>：来源 PTS，整数纳秒。</li>
+        <li><code>relative_pts_ns</code>：以本批首帧为零点。</li>
+        <li>不写伪造的 duration；相邻 PTS 差可表示实际时间间隔。</li>
+      </ul>
+
+      <h2>30 fps 不是「每帧必然 33 ms」</h2>
+      <pre>nominal interval = 1 / 30 s
+                 ≈ 33.333 ms
+
+dropped scenario:
+f0   PTS   0.0 ms
+f1   PTS  33.3 ms   Δ  33.3 ms
+f2   PTS  66.7 ms   Δ  33.3 ms
+f3   PTS 133.3 ms   Δ  66.7 ms  ← one-frame-sized hole
+f4   PTS 166.7 ms   Δ  33.3 ms</pre>
+      <p>
+        frame index 仍为 0、1、2、3、4；只有 PTS 揭示了 f3 前的时间空洞。多个较大的 delta 需要结合设备、调度和丢帧日志判断，单次抖动不自动等于丢帧。
+      </p>
+
+      <h2>AVCaptureVideoDataOutput 边界</h2>
+      <ul class="tight">
+        <li>delegate 在指定 queue 上回调，不保证与摄像头采样同时刻执行。</li>
+        <li><code>alwaysDiscardsLateVideoFrames = YES</code> 时，queue 堵塞可导致 late frame 被丢弃。</li>
+        <li>PTS 来自 sample buffer，不应替换为 <code>now()</code>。</li>
+        <li>本票 callback 只复制 tight NV12 + PTS；写盘和预览转换移到采集结束后。</li>
+      </ul>
+
+      <h2>A/V 同步边界</h2>
+      <pre>07 单视频采集：
+camera PTS → manifest
+
+真正的 A/V 同步：
+audio timeline + video timeline
+→ common clock / playback scheduling
+
+结论：保存 PTS 是必要材料，不是「已经同步」。</pre>
+
+      <h2>出处</h2>
+      <ul class="tight">
+        <li><a href="https://developer.apple.com/documentation/coremedia/cmsamplebuffergetpresentationtimestamp(_:_:)">Apple：CMSampleBufferGetPresentationTimeStamp</a></li>
+        <li><a href="https://developer.apple.com/documentation/coremedia/cmsamplebuffergetduration(_:)">Apple：CMSampleBufferGetDuration</a></li>
+        <li><a href="https://developer.apple.com/documentation/coremedia/cmtime">Apple：CMTime</a></li>
+        <li><a href="https://developer.apple.com/documentation/avfoundation/avcapturevideodataoutput">Apple：AVCaptureVideoDataOutput</a></li>
+        <li>Apple SDK <code>AVFoundation/AVCaptureVideoDataOutput.h</code> — delegate queue 与 late frame drop 语义。</li>
+      </ul>
+
+      <h2>相关课</h2>
+      <ul class="tight">
+        <li><a href="../lessons/0007-pts-vs-frame-index.html">0007 第 3 帧不一定是第 100 ms</a></li>
+        <li><a href="../lessons/0006-nv12-frame-memory.html">0006 NV12 字节账</a></li>
+      </ul>
+
+      <footer>
+        <a href="../RESOURCES.md">完整来源</a>
+        · <a href="../../docs/adr/0006-learning-video-capture-avfoundation-nv12.md">ADR-0006</a>
+        · <a href="../../.scratch/learning-project/issues/07-video-capture.md">issue 07</a>
+      </footer>
+    </main>
+  </body>
+</html>
