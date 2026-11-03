@@ -17,6 +17,7 @@ add_subdirectory(video/capture)
 add_subdirectory(video/encode)
 add_subdirectory(video/local-transport)
 add_subdirectory(video/decode)
+add_subdirectory(video/render)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)
