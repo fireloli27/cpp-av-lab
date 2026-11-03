@@ -66,8 +66,8 @@ _Avoid_: 视频码流, 压缩帧, 不指明格式与平面排列的「像素缓�
 _Avoid_: wall-clock reception time, frame index, 把采样时刻与展示时刻混为一谈
 
 **Transport Unit**:
-Learning Pipeline Stages「本地传输/打包」中，把压缩码流组织成的可在环回上发送/接收的数据单元。音频学习路径以码流 access unit（如 Opus 包）为单元内容，再加本票选定的分帧；不等于「整份容器文件当一包」，也不自动等于 RTP 包。
-_Avoid_: RTP 包（除非短文/对照明确在讲 RTP）；把整份 CAF/文件 blob 不加拆包称作本阶段的传输单元；用「分包」指称本阶段的打包
+Learning Pipeline Stages「本地传输/打包」中，把压缩码流组织成的可在环回上发送/接收的数据单元。音频学习路径以码流 access unit（如 Opus 包）为单元内容，再加长度前缀；视频学习路径的单元内容仍是一帧压缩 access unit（H.264 AVCC 载荷）。单帧可能放不进一个 UDP datagram，学习实验把同一个 Transport Unit 拆成多个 datagram（大端 `au_length`、分片序号、分片数、`au_index`、分片字节）再重组。`au_index` 只用于这次环回重组，不是 RTP sequence number。两种学习选型都不等于「整份容器文件当一包」，也不收口产品是否必须 RTP。
+_Avoid_: RTP 包（除非短文/对照明确在讲 RTP）；把整份 CAF/VAU 文件 blob 不加拆包称作本阶段的传输单元；用「分包」指称本阶段的打包；把 UDP 分片序号当成 RTP sequence number
 
 **Learning Exit Criteria**:
 学习工程收官标准：能按 Learning Pipeline Stages 讲清整条管线，并说明 Client AV SDK、Call Signaling、Media Signaling、SFU 各覆盖哪一段；五段每段至少一个自跑通实验 + 短文；另有 ≥1 篇 WebRTC 对照短文（模块映射，硬要求）。讲清管线时须能说明 AEC、弱网码率自适应、jitter buffer、A/V 同步的位置与作用，但不要求单独硬实验或调通。网络真实感、SFU 实验、双端互通、以及上述旁路的动手调参为加分包。时间窗口约每周 10–15 小时、约 4–8 周。学习姿势为混合：前段自下而上用小库/API；后段 WebRTC 对照为硬毕业条件；不以改得动 WebRTC 为毕业条件。

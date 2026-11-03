@@ -98,4 +98,4 @@ Catch2 用合成 VAU 断言往返，并用两帧纯色 NV12 走 `VTCompressionSe
 
 ## 下一课钩子
 
-**09 视频·本地传输/打包**默认读 `out/video/encode/encode.vau`，把每个 access unit 的 AVCC 载荷组织成可环回的 Transport Unit。参数集留在文件头，供解码重建 format description；解码不从 UDP 再读一遍（与音频路径一样，等价性靠环回逐字节比对）。
+**09 视频·本地传输/打包**默认读 `out/video/encode/encode.vau`，把每个 access unit 的 AVCC 载荷组织成 Transport Unit，经 UDP 分片环回（ADR-0008）。参数集留在文件头；解码不从 UDP 再读一遍，等价性靠环回逐字节比对。见 [local-transport.notes.md](./local-transport.notes.md)。

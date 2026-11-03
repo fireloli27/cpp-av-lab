@@ -15,6 +15,7 @@ add_subdirectory(audio/decode)
 add_subdirectory(audio/render)
 add_subdirectory(video/capture)
 add_subdirectory(video/encode)
+add_subdirectory(video/local-transport)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)
