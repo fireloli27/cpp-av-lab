@@ -124,7 +124,7 @@ Status: ready-for-agent
 11. ~~主测试缝是否改为统一 pipeline runner~~ → **已决（issue 01）**：维持每阶段各自入口 + 人工按短文验收（自动化护栏不替代人工短文缝）
 12. 加分包的触发条件与是否在收官后另开学习专项
 13. 时间窗口在「约 4–8 周」内的实际取舍与起止日期
-14. WebRTC 对照所针对的具体发行版 / 文档基线（在「对照短文」硬要求之下的材料选型）
+14. ~~WebRTC 对照所针对的具体发行版 / 文档基线~~ → **学习对照短文已写明材料基线**（libwebrtc `refs/heads/main`，查阅日 2026-11-03，`main@{#49134}`；见 `docs/learning/webrtc-crosswalk.md`）。不因此收口产品栈选型（U4 / U9 仍开）
 
 ## Comments
 
@@ -148,3 +148,5 @@ Status: ready-for-agent
 - 2026-11-03: issue 09——视频·本地传输/打包选定 access unit 载荷 + 1200 字节 UDP 分片环回（`au_index` 只用于重组）；未决 #4 的视传输部分收口；未决 #5 产品侧仍开；见 `issues/09-video-local-transport.md` 与 `docs/adr/0008-learning-video-local-transport-fragmented-udp.md`。
 - 2026-11-03: issue 10——视频·解码选定 `VTDecompressionSession`，按 access unit 从 `encode.vau` 还原 tight NV12 `420v`（不重跑 UDP、不要求像素逐字节相同）；未决 #4 的视解码部分收口；见 `issues/10-video-decode.md` 与 `docs/adr/0009-learning-video-decode-videotoolbox.md`。
 - 2026-11-03: issue 11——视频·渲染选定 AppKit `NSWindow` + `NSImageView`，按 `relative_pts_ns` 显示解码帧（`frames_loaded == frames_presented`；不把 A/V 同步做成实验）；贯通说明 `docs/learning/video/pipeline.md`；未决 #4 的视渲染部分收口，视频五段库选型到此齐；见 `issues/11-video-render.md` 与 `docs/adr/0010-learning-video-render-appkit.md`。
+- 2026-11-03: issue 12——旁路与职责边界叙述落在 `docs/learning/pipeline-boundaries.md`（AEC、弱网码率自适应、jitter buffer、A/V 同步的位置，以及 Call Signaling / Media Signaling、Client AV SDK / SFU）。无硬实验。未决 #1 与 #5 仍开。
+- 2026-11-03: issue 13——WebRTC 对照短文 `docs/learning/webrtc-crosswalk.md`，材料基线为 libwebrtc `refs/heads/main@{#49134}`（查阅日 2026-11-03）。未决 #14 的学习材料部分收口；U4 / U9 产品选型仍开。改 libwebrtc 不是验收条件。
