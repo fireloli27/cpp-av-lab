@@ -2,6 +2,7 @@
 
 #include "vau.hpp"
 
+#import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreImage/CoreImage.h>
 #import <CoreMedia/CoreMedia.h>
