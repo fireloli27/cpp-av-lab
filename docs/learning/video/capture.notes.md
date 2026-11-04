@@ -11,7 +11,7 @@ Learning Pipeline Stages 的**采集**（视频）：摄像头 → **Raw Video F
 
 - **上游**：无（硬件默认摄像头）
 - **本段产出**：`out/video/capture/` 下 tight `.nv12` 逐帧 + PTS `manifest.csv` + `preview.png`
-- **下游**：视频「编码」默认以这些 Raw Video Frame 为可追溯输入（见 issue 08；库未决）
+- **下游**：视频「编码」默认读这些 Raw Video Frame（见 [encode.notes.md](./encode.notes.md)，ADR-0007）
 
 A/V 同步属叙述必会旁路，通常在接收/播放一带；本阶段实验不实现。
 
@@ -75,4 +75,4 @@ A/V 同步属叙述必会旁路，通常在接收/播放一带；本阶段实验
 
 ## 下一课钩子
 
-**08 视频·编码**默认读 `out/video/capture/` 下的 Raw Video Frame（或短文写明的等价输入）。库与码流容器选型见 issue 08（仍未决）。
+**08 视频·编码**默认读 `out/video/capture/` 下的 Raw Video Frame（或短文写明的等价输入），压成 H.264 access unit（`encode.vau`）。见 [encode.notes.md](./encode.notes.md)。

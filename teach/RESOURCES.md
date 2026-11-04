@@ -62,6 +62,6 @@
 
 ## Gaps
 
-- WebRTC 对照短文尚未写（Learning 硬毕业另票）；RTP 深挖等对照课再开。
+- WebRTC 对照短文已写：`docs/learning/webrtc-crosswalk.md`（libwebrtc `main`，查阅日 2026-11-03）。教室仍不把 RTP 深挖或改 libwebrtc 当课。
 - jitter buffer / 弱网自适应动手实验属加分包，本教室只预告位置。
 - A/V 同步的跨 clock 实作与颜色矩阵转换尚未开课；PTS、duration 与 callback queue 已由课 0007 建立边界。语言缝（C++ 契约 / `.mm` 会话）由课 0008 建立，尚未经检索证实。
